@@ -257,7 +257,7 @@ because
   
   first(K:V,[K1:V1|Xs]) :- K=K1 -> V=V1 ; first(K:V, Xs).
 \end{verbatim}
-\caption{HM in Prolog \cite{lpaste}}
+\caption{HM in Prolog}
 \label{fig:HM}
 \end{figure}
 
@@ -462,7 +462,13 @@ That is, \verb|type| has six arguments, \verb|type(KC,C,E,A,T,Gs,Gs1)|.
 The fifth (input) argument \verb|Gs| is the current list of delayed goals
 before invoking \verb|type|. The last (output) argument \verb|Gs1| obtains
 the list of delayed goals after invoking \verb|type|. These two arguments
-are threaded through the recursive definition of the \verb|type| predicate.
+are threaded through the recursive definition of
+the \verb|type| predicate.\footnote{
+  Experienced Prolog programmer would use
+  \emph{DCG Grammer rules} \cite{SWIPrologManual} to abstract away
+  these kind of extra arguments for threading accumulated differences.
+  Here, we choose to stick to more basic constructs to be more accessible,
+  relying less on background knowledge of Prolog idioms and libraries.}
 
 The \verb|infer_type| predicate implements the two-staged solution,
 as follows:
@@ -554,14 +560,16 @@ type(KC,C,letrec(X=E0,E1),T,G,G1) :- type(KC,[X:mono(A)  |C],E0,A,G, G0),
                                      type(KC,[X:poly(C,A)|C],E1,T,G0,G1).
 \end{verbatim} }
 
-We could also allow polymorphic recursion by type annotations on the
-let-bound variable, like we will do for Mendler-style iteration \ref{ssec:mit}.
+We could also allow polymorphic recursion by type annotations
+on the let-bound variable, like we will do for Mendler-style iteration
+over non-regular datatypes \ref{ssec:mit}.
 
 
 \subsection{Pattern Matching for Algebraic Datatypes}\label{ssec:patlam}
-In Fig.\ref{fig:patlam}, we specify pattern matching expressions without
-the scrutinee, which is also known as pattern-matching lambdas.
-A pattern lambda is a function that awaits an expression to be passed in
+In Fig.\ref{fig:patlam} (on p\pageref{fig:patlam}, we specify
+pattern matching expressions without the scrutinee, which is
+also known as pattern-matching lambdas. A pattern lambda is
+a function that awaits an expression to be passed in
 as an argument to pattern-match with its value. For example,
 let $\{p_1\to e_1;\cdots; p_n\to e_n\}$ be a pattern-matching lambda.
 Then, the application $\,\{p_1\to e_1;\cdots; p_n\to e_n\}\,e\,$
