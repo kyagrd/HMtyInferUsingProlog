@@ -162,8 +162,9 @@ is a transcription of the typing rule for applications
 $~~\frac{C\vdash X:A\to B\qquad~~\quad C\vdash Y:A}{C\vdash X\,Y:B}$ in STLC.
 The \verb|first| predicate implements looking up a binding
 (\verb|X:T|) in the typing context (\verb|C|)
-by first occurrence of the variable name (\verb|X|). 
-In case of repeated variable names, choosing the first reflects shadowing (most recently bound variable). %% fix?
+by first occurrence of the variable name (\verb|X|).
+In case of repeated variable names, choosing the first occurrence in the context reflects shadowing of bound variables,
+e.g. the term $(\lambda x. \lambda x. x)$ will have only one type schema, the one of $(\lambda x. \lambda y. y)$.
 We assume variable names are given as atoms.\footnote{
     In Prolog, identifiers that start with an uppercase letter or
     an underscore (e.g., \texttt{X}, \texttt{Xs}, or \texttt{\_G1}) are
@@ -217,7 +218,7 @@ for the identity function ($\textit{id}:\forall X.X\to X$):
   ~\textsf{in}~\textit{id}\;\textit{id} \; .\]
 This let expression is well-typed in HM because the polymorphic type
 can be instantiated differently in each occurrence of \textit{id}
-in the application expression:
+in the application expression. We distinguish different occurences by superscripts:
 \[\frac{\textit{id}:\forall X.X\!\to\!X\vdash
           \textit{id}^{\,\textcolor{red}{1}}\! : (\squiggly{A \to A}) \to (A \to A)
         \qquad
@@ -229,8 +230,8 @@ in the application expression:
       \! : A \to A
   } \; .
 \]
-If \textit{id} had been bound monomorphically, it would be ill-typed
-because
+If \textit{id} had been bound monomorphically, the application would be ill-typed
+because the type of \textit{id} would have to unify with its domain: 
 \[\frac{\textit{id}:A\!\to\!A\vdash
           \textit{id}^{\,\textcolor{red}{1}}\! : \!\squiggly{\,A\,}\! \to A
         \qquad
@@ -329,7 +330,7 @@ and kind annotation in the type signature, as follows:\footnote{
 \[\textit{mkToSet}\;::\;
     \forall\,(c :: *\to*)\,(a :: *)\,.\,
       (c~a\to\textit{List}~a) \to (c~a\to\textit{Set}~a) \; .\]
-We gave explicit type signatures above for the sake of smooth explanation,
+We gave explicit type signatures above for the sake of clarity,
 but the type of \textit{mkToSet} can be completely inferred from
 its definition, without the type signature of \textit{mkToSet}.
 In this subsection, we extended the Prolog specification of HM,
@@ -366,7 +367,7 @@ in order to invoke checks for well-kindedness using the kinding rules
 
 First step is to have the typing rules take an additional argument for
 kinding context (\verb|KC|) along with the typing context (\verb|C|).
-Because the kinding rules require kinding contexts. The typing rules
+Because the kinding rules require a kinding context. The typing rules
 should keep track of the kinding context in order to invoke \verb|kind|
 from \verb|type|. Thus, we add another argument to \verb|type| for
 the kinding context (i.e., from \verb|type(C,...)| to \verb|type(KC,C,...)|).
@@ -771,7 +772,7 @@ In Nax, pattern-matching lambdas can have annotations, which are
 just like the annotations on the Mender-style iteration in \S\ref{ssec:mit},
 to aid type inference.
 
-The kind structure needed for type constructor polymorphism is exactly
+The kind structure needed for type constructor (i.e. higher-kinded) polymorphism is exactly
 the kinds supported in the higher-order polymorphic lambda calculus,
 known as System \Fw\ [TODO cite Fw]. Type constructors in \Fw\ can have
 types as arguments. For example, the type constructor \textit{List}
