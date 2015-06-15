@@ -162,7 +162,8 @@ is a transcription of the typing rule for applications
 $~~\frac{C\vdash X:A\to B\qquad~~\quad C\vdash Y:A}{C\vdash X\,Y:B}$ in STLC.
 The \verb|first| predicate implements looking up a binding
 (\verb|X:T|) in the typing context (\verb|C|)
-by first occurrence of the variable name (\verb|X|).
+by first occurrence of the variable name (\verb|X|). 
+In case of repeated variable names, choosing the first reflects shadowing (most recently bound variable). %% fix?
 We assume variable names are given as atoms.\footnote{
     In Prolog, identifiers that start with an uppercase letter or
     an underscore (e.g., \texttt{X}, \texttt{Xs}, or \texttt{\_G1}) are
@@ -261,7 +262,7 @@ because
 \end{figure}
 
 In the specification of HM (Fig.~\ref{fig:HM}), a monomorphic type
-is emphasized as \verb|mono(A)|, which corresponds to simply \verb|A|
+is represented as \verb|mono(A)|, which corresponds to simply \verb|A|
 in the STLC specification (Fig.~\ref{fig:HM}), whereas a polymorphic type
 has the form \verb|poly(C,A)|. A typing context in HM may contain
 two kinds of bindings: monomorphic bindings (\verb|X:mono(A)|) and
@@ -283,7 +284,7 @@ The \verb|instantiate| predicate
 cleverly implements the idea of polymorphic instantiation in HM.
 The built-in predicate \verb|copy_term| makes a copy of the first argument
 and unifies it with the second argument. The copied version is identical to
-the original term except all the Prolog variables has been substituted with
+the original term except all the Prolog variables have been substituted with
 freshly generated variables. The instantiation a polymorphic type
 \verb|poly(CTX,T)| is implemented as \verb|copy_term(t(CTX,T),t(CTX,T1))|.
 Firstly, a copied version of \verb|t(CTX,T)| is made. Say \verb|t(CTX2,T2)|
@@ -549,9 +550,13 @@ when inferring the type of the expression (\verb|E0|) defining
 the let-bound value, as follows:
 {\small
 \begin{verbatim}
-type(KC,C,letrec(X=E0,E1),T,G,G1) :- type(KC,[x:mono(A)  |C],E0,A,G, G0),
+type(KC,C,letrec(X=E0,E1),T,G,G1) :- type(KC,[X:mono(A)  |C],E0,A,G, G0),
                                      type(KC,[X:poly(C,A)|C],E1,T,G0,G1).
 \end{verbatim} }
+
+We could also allow polymorphic recursion by type annotations on the
+let-bound variable, like we will do for Mendler-style iteration \ref{ssec:mit}.
+
 
 \subsection{Pattern Matching for Algebraic Datatypes}\label{ssec:patlam}
 In Fig.\ref{fig:patlam}, we specify pattern matching expressions without
@@ -647,6 +652,7 @@ foldl_ap(E0,[E1|Es], E) :- foldl_ap(E0$E1, Es, E).
 \label{fig:mit}
 \end{figure}
 
+%% TODO Show typing rules, especially for mendler things
 
 \subsection{Recursion Schemes for Non-Regular Algebraic Datatypes}
 \label{ssec:mit}
@@ -828,11 +834,6 @@ TODO\\
 TODO\\
 
 
-
-\subsubsection*{Acknowledgments.} Special thanks to Andrea Vezzosi
-for posting the HM implementation in Prolog and also to the Haskell
-IRC channel users who would have been involved in coming up with the idea;
-that 7 lines of code provided additional motivation for this case study.
 
 \makeatletter
 \renewcommand\bibsection{\section*\bibname}
