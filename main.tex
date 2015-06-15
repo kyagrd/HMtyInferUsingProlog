@@ -29,6 +29,7 @@
 \makeatletter
 \def\squiggly{\bgroup \markoverwith{\textcolor{red}{\lower3.5\p@\hbox{\sixly \char58}}}\ULon}
 \makeatother
+\usepackage[square,numbers]{natbib}
 
 
 \newcommand{\keywords}[1]{\par\addvspace\baselineskip
@@ -36,6 +37,7 @@
 
 \newcommand{\Fw}{\ensuremath{\mathrm{F}_\omega}}
 \newcommand{\Fi}{\ensuremath{\mathrm{F}_i}}
+\newcommand{\HMX}{\ensuremath{\mathrm{HM}(\mathcal{X})}}
 
 \begin{document}
 
@@ -53,7 +55,7 @@
 % their surnames. This ensures that the names appear correctly in
 % the running heads and the author index.
 %
-\author{Ki Yung Ahn%
+\author{Ki Yung Ahn\and Andrea Vezzosi
 %% \thanks{Please note that the LNCS Editorial assumes that all authors have used
 %% the western naming convention, with given names preceding surnames. This determines
 %% the structure of the names in the running heads and the author index.}%
@@ -68,7 +70,10 @@
 % the affiliations are given next; don't give your e-mail address
 % unless you accept that it will be published
 \institute{Portland State University,\\ Portland, OR, USA\\
-     \path|kya@pdx.edu|}
+     \path|kya@pdx.edu| \\~\\
+     Charmers University of Technology,\\ Gothenburg, Sweden\\
+     \path|vezzosi@charmers.se|
+   }
 
 %
 % NB: a more complex sample for affiliations and the mapping to the
@@ -109,44 +114,13 @@ tools for staged resolution of different relations at different levels.
         }
 \end{abstract}
 
-\section{Introduction}
 
-type constructor polymorphism (a.k.a. higher-kinded polymorphism)
-TODO
-
-runs in SWI Prolog 7.2.
-
-logic programming languages such as Prolog are natural candidates
-
-based on Hindley--Milner type inference
-
-\section{}
-
-\subsection{TODO}
-
-TODO TODO cite these
-%% delayed goals are not uncommon in logic programming
-%% (AILog
-%% 
-%% http://artint.info/html/ArtInt_329.html
-%% 
-%% https://books.google.com/books?id=Q4i5edW7IyQC&pg=PA321&lpg=PA321
-%%
-%% https://books.google.com/books?id=d2_i0qeP6yUC&pg=PA645&lpg=PA645
-%%
-
-\subsection{TODO}
-
-unification based
-
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
+%%%%%% \section{Introduction}\label{sec:intro} %%%%%%%%%%%%%%%
+\input{intro} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Polymorphic type inference specifications in Prolog}
-\label{sec:prolog}
+\label{sec:poly}
 We start from a Prolog specification for the type system of
 simply-typed lambda calculus (STLC) (\S\ref{ssec:STLC})
 and gradually add more features of polymorphism. We discuss
@@ -282,7 +256,7 @@ because
   
   first(K:V,[K1:V1|Xs]) :- K=K1 -> V=V1 ; first(K:V, Xs).
 \end{verbatim}
-\caption{HM in Prolog \cite{urlHM}}
+\caption{HM in Prolog \cite{lpaste}}
 \label{fig:HM}
 \end{figure}
 
@@ -355,8 +329,8 @@ and kind annotation in the type signature, as follows:\footnote{
     \forall\,(c :: *\to*)\,(a :: *)\,.\,
       (c~a\to\textit{List}~a) \to (c~a\to\textit{Set}~a) \; .\]
 We gave explicit type signatures above for the sake of smooth explanation,
-but the type of \texttt{mkToSet} can be completely inferred from
-its definition, without the type signature of \texttt{mkToSet}.
+but the type of \textit{mkToSet} can be completely inferred from
+its definition, without the type signature of \textit{mkToSet}.
 In this subsection, we extended the Prolog specification of HM,
 in the previous subsection to support type constructor polymorphism.
 
@@ -421,7 +395,7 @@ the kinding context (i.e., from \verb|type(C,...)| to \verb|type(KC,C,...)|).
     findall(Ty, member(kind(_,Ty,_),Gs), Tys),
     free_variables(Tys, Xs), % collect all free tyvars in Xs
     maplist(variablize,Xs),  % concretize tyvar with var(t) where t fresh
-    findall(A:mono(K), member(var(A),Xs), KC1), % kind binidngs for var(t)
+    findall(A:K, member(var(A),Xs), KC1), % kind binidngs for var(t)
     appendKC(Gs,KC1,Gs1),  % extend kinding context with new kind bindings
     maplist(call,Gs1).     % run all goals in Gs1
   
@@ -609,9 +583,10 @@ ordinary lambda expressions.
 
 The specification above for non-nested pattern-matching lambdas
 is only 16 lines. To sum up, the specification for HM extended
-with type constructor, kind polymorphism, and non-nested pattern matching
-for algebraic datatypes is in $26+16=42$ lines of Prolog, which is also
-an executable reference implementation of the type system.
+with type constructor polymorphism, kind polymorphism, and
+non-nested pattern matching for algebraic datatypes is in $26+16=42$
+lines of Prolog, which is also an executable reference implementation
+of the type system.
 
 \begin{figure}
 \begin{verbatim}
@@ -707,9 +682,9 @@ the type argument ($a$) of its containing \textit{Bush}. That is,
 a bush headed by an element of type $a$ is tailed by a bush whose
 head element is of type \emph{Bush a}. A recursive datatype that
 has a non-regular recursive occurrence, as in \emph{Bush}, is called
-a \emph{non-regular datatype}, also known as a \emph{nested datatype}
-because the types of recursive components typically become nested as
-the recursion goes deeper
+a \emph{non-regular datatype}, also known as
+a \emph{nested datatype}\;\cite{BirMee98} because the types of
+recursive components typically become nested as the recursion goes deeper
 (e.g., $\textit{Bush}(\textit{Bush}(\cdots(Bush(\textit{Bush}~a))\cdots))$).
 
 In order to define interesting and useful recursive functions over
@@ -718,10 +693,11 @@ type inference is known to be undecidable without the aid of
 user supplied type annotations. In Fig.\ref{fig:mit}, we specify
 a subset of a functional language that supports a recursion scheme, which
 naturally generalize from regular datatypes to non-regular datatypes.
-In particular, we specify the Mendler-style iteration [cite mit paper]
-supported in the Nax language [cite Nax]. In Nax, all recursive
-constructs, both at the type level and at the term level, are
-defined using the primitives provided by the language, avoiding
+In particular, we specify
+the Mendler-style iteration \cite{matthes98phd,AbeMatUus03}
+supported in the Nax language \cite{Ahn14thesis}. In Nax,
+all recursive constructs, both at the type level and at the term level,
+are defined using the primitives provided by the language, avoiding
 uncontrolled general recursion. The \verb|mu(F)| appearing in
 the Prolog specification corresponds to the recursive types $\mu F$
 constructed by the fixpoint type operator $\mu$ applied to
@@ -740,8 +716,8 @@ properly set up the kinding context and typing context for the name of
 recursive call (\verb|X|), the rest amounts to inferring types for
 pattern-matching lambdas.
 Pointers to further details on Mendler-style recursion
-[cites on Mendler-style recursion] and Nax [cite Nax] are available
-in the references section at the end of this paper.
+\cite{vene00phd,AbeMatUus03,AhnShe11} and Nax \cite{Ahn14thesis}
+are available in the references section at the end of this paper.
 
 The specification for Mendler-style iteration is only 20 lines,
 including pattern-matching lambdas $16+20=36$ lines, including
@@ -771,37 +747,56 @@ GADTs add complexity of introducing local constraints
 within a pattern-matching clause, which should not escape
 the scope of the clause, unlike global unification constraints in HM.
 It would be interesting to see whether Prolog's built-in support for
-handling unification variables and symbols
-(e.g., \verb|copy_term| or \verb|gensym|) could help us express
-the concept of local constraints as elegantly as expressing
-polymorphic instantiation. In addition, more user supplied
-annotations will be required to guide the type inference,
-even for pattern-matching lambdas that do not involve recursion,
-because GADT type inference is undecidable by itself regardless
-of polymorphic recursion. In Nax, pattern-matching lambdas can
-have annotations, which are just like the annotations
-on the Mender-style iteration in \S\ref{ssec:mit}.
+handling unification variables and symbols could help us express
+the concept of local constraints as elegantly as we expressed
+polymorphic instantiation in \S\ref{sec:poly}. In addition,
+more user supplied annotations will be required to guide the type inference,
+even when recursion is not involved, because GADT type inference is
+undecidable \cite{DegtyarevV95} regardless of the use of recursion.
+In Nax, pattern-matching lambdas can have annotations, which are
+just like the annotations on the Mender-style iteration in \S\ref{ssec:mit},
+to aid type inference.
 
-Pattern matching for 
+The kind structure needed for type constructor polymorphism is exactly
+the kinds supported in the higher-order polymorphic lambda calculus,
+known as System \Fw\ [TODO cite Fw]. Type constructors in \Fw\ can have
+types as arguments. For example, the type constructor \textit{List}
+for lists has kind $* \to *$, which means that it needs one type argument
+to be fully applied as a type (e.g. $\textit{List}~\texttt{Nat} : *$).
+\begin{align*}
+  &\text{kind in System \Fw}  &&\kappa ::= * \mid \kappa \to \kappa \\
+  &\text{kind in System \Fi}  &&\kappa ::= * \mid \kappa \to \kappa
+                                             \mid \{A\,\}\to \kappa
+\end{align*}
+To support terms, as well as types, to be applied to type constructors
+as arguments, the kind structure needs to be extended.
+System~\Fi\ \cite{AhnSheFioPit13} extends extend the kind structure
+with $\{A\,\}\to \kappa$ to support term indices in types.
+This extension to kinds allows type constructors with term indicies
+such as $\textit{Vec} : * \to \{\textit{Nat}\,\} \to *$ for vectors
+(a.k.a. length indexed lists). For instance,
+$\textit{Vec}~\textit{Bool}~\{8\}$ is a type of boolean vectors of length 8.
+There are two ramifications of term indices being involved in type inference:
+\begin{itemize}\vspace*{-.75ex}
+\item the unification is modulo equivalence of terms: For instance,
+  the type system should consider $\textit{Vec}~\textit{Bool}~\{n\}$ and
+  $\textit{Vec}~\textit{Bool}~\{(\lambda x.x)\;n\}$ as equivalent types.
+  \vspace*{.5ex}
+\item Type inference/checking and kind inference/checking invokes each other:
+  A typing rule had to invoke a kinding rule to support
+  type constructor polymorphism  (\S\ref{ssec:HMtck}).
+  In the extended kind structure, types can appear in kinds
+  ($A$ in $\{\!A\}\to\kappa$), therefore, kinding rules
+  need to invoke typing rules.
+\end{itemize}
+Extending our specification with term indicies, while continuing to serve
+as a reference implementation, would be an interesting future work that
+might involve resolving possible challenges from these two ramifications.
 
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
+%%%%%% \section{Related Work}\label{sec:relwork} %%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{relwork}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Related Work}\label{sec:relwork}
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
 
 \section{Conclusions}\label{sec:concl}
 
@@ -839,59 +834,9 @@ for posting the HM implementation in Prolog and also to the Haskell
 IRC channel users who would have been involved in coming up with the idea;
 that 7 lines of code provided additional motivation for this case study.
 
-\section{The References Section}\label{references}
-
-In order to permit cross referencing within LNCS-Online, and eventually
-between different publishers and their online databases, LNCS will,
-from now on, be standardizing the format of the references. This new
-feature will increase the visibility of publications and facilitate
-academic research considerably. Please base your references on the
-examples below. References that don't adhere to this style will be
-reformatted by Springer. You should therefore check your references
-thoroughly when you receive the final pdf of your paper.
-The reference section must be complete. You may not omit references.
-Instructions as to where to find a fuller version of the references are
-not permissible.
-
-We only accept references written using the latin alphabet. If the title
-of the book you are referring to is in Russian or Chinese, then please write
-(in Russian) or (in Chinese) at the end of the transcript or translation
-of the title.
-
-The following section shows a sample reference list with entries for
-journal articles \cite{jour}, an LNCS chapter \cite{lncschap}, a book
-\cite{book}, proceedings without editors \cite{proceeding1} and
-\cite{proceeding2}, as well as a URL \cite{url}.
-Please note that proceedings published in LNCS are not cited with their
-full titles, but with their acronyms!
-
-\begin{thebibliography}{4}
-
-\bibitem{jour} Smith, T.F., Waterman, M.S.: Identification of Common Molecular
-Subsequences. J. Mol. Biol. 147, 195--197 (1981)
-
-\bibitem{lncschap} May, P., Ehrlich, H.C., Steinke, T.: ZIB Structure Prediction Pipeline:
-Composing a Complex Biological Workflow through Web Services. In: Nagel,
-W.E., Walter, W.V., Lehner, W. (eds.) Euro-Par 2006. LNCS, vol. 4128,
-pp. 1148--1158. Springer, Heidelberg (2006)
-
-\bibitem{book} Foster, I., Kesselman, C.: The Grid: Blueprint for a New Computing
-Infrastructure. Morgan Kaufmann, San Francisco (1999)
-
-\bibitem{proceeding1} Czajkowski, K., Fitzgerald, S., Foster, I., Kesselman, C.: Grid
-Information Services for Distributed Resource Sharing. In: 10th IEEE
-International Symposium on High Performance Distributed Computing, pp.
-181--184. IEEE Press, New York (2001)
-
-\bibitem{proceeding2} Foster, I., Kesselman, C., Nick, J., Tuecke, S.: The Physiology of the
-Grid: an Open Grid Services Architecture for Distributed Systems
-Integration. Technical report, Global Grid Forum (2002)
-
-\bibitem{url} National Center for Biotechnology Information, \url{http://www.ncbi.nlm.nih.gov}
-
-\bibitem{urlHM} Andrea Vezzosi, Hindley Milner in 7 lines of hacky prolog,
-\url{http://lpaste.net/65035}
-
-\end{thebibliography}
-
+\makeatletter
+\renewcommand\bibsection{\section*\bibname}
+\makeatother
+\bibliographystyle{abbrvnat}
+\bibliography{main}
 \end{document}
