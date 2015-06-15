@@ -1,8 +1,40 @@
 \section{Introduction}\label{sec:intro}
+When implementing a language type system, we often face a gap between
+the design described on paper and the actual implementation. Sometimes
+there is no formal description but only an ambiguous description in English
+(or in other natural languages). Even when there is a mathematical description
+of the type system on paper, there can be a gap between the type system design
+and implementation. Language designers and implementers can suffer from this gap
+because it is difficult to determine whether a problem originated from a flaw
+in the design or bug in implementation.
+Having a declarative (i.e., structurally similar to the design)
+and flexible (i.e., easily modifiable) machine executable specification
+(or reference implementation) is extremely helpful, especially
+in an early developing state of prototyping or when experimenting with
+possible extensions to the language type system.  
+Jones' attempt of \emph{Typing Haskell in Haskell} \cite{JonesTHiH99} is
+an exemplary work that demonstrates the value of such a concise, declarative,
+and machine executable specification --
+90+ pages of Hugs type checker implementation in C code specified in
+only 400+ lines readable Haskell.
 
-Typing Haskell in Haskell
+In our case study we use Prolog to specify polymorphic features of
+modern functional languages. Logic programming languages like Prolog
+are natural candidates for the purpose of specifying language type systems
+that support type inference because (1) the syntax and semantics are
+designed to represent logical inference rules (which is how type systems
+are typically formalized) and (2) native support for unification (which
+is the basic building block for type inference algorithm). As a result,
+Prolog specifications are usually more succinct than a specification
+using a functional language.
+
+a logic programming language that is
+equipped with native support for unification 
+Typing Haskell in Haskell 
 
 TODO page limit is 18 pages. I think there is adequate space left.
+
+In 
 Main matter (\S\ref{sec:poly} and \S\ref{sec:other}) is written
 so no more significant changes, b ut clarification and grammar typo fix etc.
 Other sections are still ongoing.
