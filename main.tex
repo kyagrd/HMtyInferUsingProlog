@@ -816,32 +816,31 @@ might involve resolving possible challenges from these two ramifications.
 
 \section{Conclusions}\label{sec:concl}
 
-TODO observe
-specification
+We defined in Prolog a type inference implementation for a non-trivial
+type system by making extensive use of Prolog's native support for
+unification, allowing us to obtain a concise and runnable
+specification. In particular we use Prolog's unification variables to
+represent type (or kind) variables in type (or kind) schemas.
 
-TODO clearer picture of how type inference and kind inference
-interact with each other
+We overcame the conflicting view of type variables between type- and
+kind-checking by delaying kind-checking constraints until after
+typechecking is completed and type variables can be made ground and so
+can be used as indexes into the kinding context.
 
-TODO although not pure
-but does not explicit rely on destructive updates
-So there is a degree of being declarative here
+We also showed the flexibility of this technique by successively
+extending the language with more advanced language features like
+recursive let, pattern matching and Mendler-style iteration.
 
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
+
+%% TODO observe
+%% specification
+
+%% TODO clearer picture of how type inference and kind inference
+%% interact with each other
+
+%% TODO although not pure
+%% but does not explicit rely on destructive updates
+%% So there is a degree of being declarative here
 
 
 
