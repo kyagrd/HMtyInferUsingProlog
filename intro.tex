@@ -14,50 +14,51 @@ in an early developing state of prototyping or when experimenting with
 possible extensions to the language type system.  
 Jones' attempt of \emph{Typing Haskell in Haskell} \cite{JonesTHiH99} is
 an exemplary work that demonstrates the value of such a concise, declarative,
-and machine executable specification --
+and machine executable specification:
 90+ pages of Hugs type checker implementation in C code specified in
 only 400+ lines readable Haskell.
 
-In our case study we use Prolog to specify polymorphic features of
+In our case study, we use Prolog to specify advanced polymorphic features of
 modern functional languages. Logic programming languages like Prolog
 are natural candidates for the purpose of specifying language type systems
 that support type inference because (1) the syntax and semantics are
 designed to represent logical inference rules (which is how type systems
 are typically formalized) and (2) native support for unification (which
-is the basic building block for type inference algorithm). As a result,
+is the basic building block for type inference algorithms). As a result,
 Prolog specifications are usually more succinct than a specification
 using a functional language.
 
-a logic programming language that is
-equipped with native support for unification 
-Typing Haskell in Haskell 
+Our contributions are:
+\begin{itemize}\vspace*{-1.75ex}
+\item A declarative and fully functioning type infernce implementation
+in much less than 100 lines of Prolog: We only used bulit-ins and
+fairly basic library functions to specify
+type polymorphism, type constructor polymorphism, kind polymorphism,
+(non-nested) pattern-mathcing and recursion schemes for non-regular
+algebraic datatypes.
+\item Two-staged inference for types and kinds using dealyed goals:
+We discovered that kind inference can be delayed after type inference
+(it is in some sense quite natural) and exploited the fact to get the
+most out of Prolog's native unification in both type inference and
+kind inference (which helped our specification to be more succinct).
+\end{itemize}
 
-TODO page limit is 18 pages. I think there is adequate space left.
+We give step-by-step tutorial style explanation of our specification in
+\S\ref{sec:poly}, starting from the Prolog specification of
+the simply-typed lambda calculus, which supports no forms of polymorphism.
+In \S\ref{sec:other}, we demonstrate that our method of specification is
+flexible for extensions with other language features.
+All our Prolog specification runs in \S\ref{sec:poly} and \S\ref{sec:other}
+are tested on SWI Prolog 7.2 and available on TODO github url maybl??.
+We discuss future work
+on more challenging language features such as GADTs and term indicies in
+\S\ref{sec:futwork}. We discuss \S\ref{sec:relwork} and
+conclusion --- last paragraph can be revised later.
 
-In 
-Main matter (\S\ref{sec:poly} and \S\ref{sec:other}) is written
-so no more significant changes, b ut clarification and grammar typo fix etc.
-Other sections are still ongoing.
-
-TODO
-Write future work briefly, related work discussions, and write a good intro/motivation,
-and then submit!
-
-type constructor polymorphism (a.k.a. higher-kinded polymorphism)
-
-TODO mention that all our Prolog specification runs in SWI Prolog 7.2.
-and available online point to github repo
+%% oustidein \cite{OutsideInICFP09}
 
 
-logic programming languages such as Prolog are natural candidates
-
-based on Hindley--Milner type inference
-
-
-oustidein \cite{OutsideInICFP09}
-
-
-TODO TODO cite these
+%%% TODO TODO cite these
 %% delayed goals are not uncommon in logic programming
 %% (AILog
 %% 
@@ -67,12 +68,4 @@ TODO TODO cite these
 %%
 %% https://books.google.com/books?id=d2_i0qeP6yUC&pg=PA645&lpg=PA645
 %%
-
-unification based
-
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
 
