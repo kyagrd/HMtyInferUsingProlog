@@ -646,7 +646,7 @@ type(KC,C,mit(X,Is-->T0,Alts),A->T,G,G1) :-
   length(Is,N), length(Es,N), foldl_ap(mu(F),Es,A),
   is_list(Alts), gensym(r,R), foldl_ap(var(R),Is,RIs),
   KC1 = [R:mono(K)|KC], C1 = [X:poly(C,RIs->T0)|C],
-  G0 = [kind(KC1,F,K->K), kind(KC1,A->T,o) | G], % delayed goal
+  G0 = [kind(KC1,F,K->K), kind(KC,A->T,o) | G], % delayed goal
   foldl_ap(F,[var(R)|Is],FRIs),
   type_alts(KC1,C1,Alts,FRIs->T,G0,G1).
 
