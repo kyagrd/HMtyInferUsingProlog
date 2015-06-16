@@ -3,19 +3,41 @@ The idea of using logic programming to specify type inference is not new.
 \citet*{HMX99} defined a general framework called \HMX\ for specifying
 extensions of HM (e.g., records, type classes, intersection types)
 and \citet{tyinferCHR02} implemented \HMX\ using Prolog with
-constraint handling rules (CHR).
+constraint handling rules (CHR). Testing a type system extension
+in the \HMX\ framework provides a certain level of confidence that the extension
+would work well with type polymoprhism in HM. Testing an extension by
+extending our specification provides additional confidence that the extesion
+would work will with type constructor polymorphism and kind polymorphism,
+as well as with type polymorhpism.
 
-TODO\\
-The situation I understand is that work around HM(X) does not consider
-type constructor polymorphism.
+The concept of delayed goals have been used in many differrent context
+in logic programming. An AILog\footnote{A logical inference system for designing
+	 intelligent agents.} textbook \cite{AILogTextBook},
+introduces delaying golas as one of the useful abilities of meta-interpreter.
+Many prolog systems, such as SWI or SICStus, provide built-in support for
+delaying a goal untill certiain conditions are met using the predicates
+such as \verb|freeze| or \verb|when|. In our implementation of
+type constructor polymorphism and kind polymorphsim, we cannot
+simiply use freeze or when because we need pre-processng on
+the collected delayed goals (see \verb|variableze| in \S\ref{ssec:HMtck}).
+
+%% delayed goals are not uncommon in logic programming
+%% http://artint.info/html/ArtInt_329.html
+%% 
+%% https://books.google.com/books?id=Q4i5edW7IyQC&pg=PA321&lpg=PA321
+%%
+%% https://books.google.com/books?id=d2_i0qeP6yUC&pg=PA645&lpg=PA645
 
 TODO
-$\alpha$Prolog
+$\lambda$Prolog 
+$\alpha$Prolog 
+has certain features that support certain concepts in a purely logical manner
+but flexibility availability trade-off
+SWI or SICStus
 TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
-TODO\\
+
+Recently, there has been research on type inference using logic programming
+with non-standard semantics (e.g., corecursive, coinductive, or coalgebraic)
+(e.g., \cite{})
+featherweight java
 

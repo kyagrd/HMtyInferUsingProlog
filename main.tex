@@ -564,11 +564,11 @@ type(KC,C,letrec(X=E0,E1),T,G,G1) :- type(KC,[X:mono(A)  |C],E0,A,G, G0),
 
 We could also allow polymorphic recursion by type annotations
 on the let-bound variable, like we will do for Mendler-style iteration
-over non-regular datatypes \ref{ssec:mit}.
+over non-regular datatypes \S\ref{ssec:mit}.
 
 
 \subsection{Pattern Matching for Algebraic Datatypes}\label{ssec:patlam}
-In Fig.\ref{fig:patlam} (on p\pageref{fig:patlam}, we specify
+In Fig.\ref{fig:patlam} (on p\pageref{fig:patlam}), we specify
 pattern matching expressions without the scrutinee, which is
 also known as pattern-matching lambdas. A pattern lambda is
 a function that awaits an expression to be passed in
@@ -706,16 +706,37 @@ recursive components typically become nested as the recursion goes deeper
 In order to define interesting and useful recursive functions over
 non-regular datatypes, one needs polymorphic recursion, whose 
 type inference is known to be undecidable without the aid of
-user supplied type annotations. In Fig.\ref{fig:mit}, we specify
-a subset of a functional language that supports a recursion scheme, which
-naturally generalize from regular datatypes to non-regular datatypes.
+user supplied type annotations. In Fig.~\ref{fig:mit} (on p\ref{fig:mit}),
+we specify a subset of a functional language that supports a recursion scheme,
+which naturally generalize from regular datatypes to non-regular datatypes.
 In particular, we specify
 the Mendler-style iteration \cite{matthes98phd,AbeMatUus03}
 supported in the Nax language \cite{Ahn14thesis}. In Nax,
 all recursive constructs, both at the type level and at the term level,
 are defined using the primitives provided by the language, avoiding
-uncontrolled general recursion. The \verb|mu(F)| appearing in
-the Prolog specification corresponds to the recursive types $\mu F$
+uncontrolled general recursion.
+
+%% \begin{figure}
+%% \[ (\mu)\frac{\Delta \vdash F : \kappa \to \kappa}{
+%%               \Delta : \mu_\kappa F : \kappa} \]
+%% 
+%% \[ (\textbf{in})
+%%     \frac{ \Delta;\Gamma \vdash e :  F(\mu_\kappa F)\,\overline{A}
+%%            \qquad \Delta \vdash F : \kappa \to \kappa
+%%            \qquad \Delta \vdash \mu_\kappa F\, \overline{A} : *}{
+%%            \Delta;\Gamma \vdash
+%%            \textbf{in}_\kappa\,e  : \mu_\kappa F \, \overline{A} }
+%% \]
+%% \[ (\textbf{mit})
+%%    \frac{\Delta;\Gamma \vdash }{
+%%      \Delta;\Gamma \vdash \textbf{mit}_\kappa : \}
+%% \]
+%% \caption{A kinding rule ($\mu$) and typing rules of Mendler-style iteration}
+%% \label{fig:mitrule}
+%% \end{figure}
+
+The \verb|mu(F)| appearing in the Prolog specification
+corresponds to the recursive types $\mu F$
 constructed by the fixpoint type operator $\mu$ applied to
 a base structure $F$, which is not recursive by itself.
 Here, we require that $F$ is either a type constructor introduced by
@@ -735,9 +756,9 @@ Pointers to further details on Mendler-style recursion
 \cite{vene00phd,AbeMatUus03,AhnShe11} and Nax \cite{Ahn14thesis}
 are available in the references section at the end of this paper.
 
-The specification for Mendler-style iteration is only 20 lines,
-including pattern-matching lambdas $16+20=36$ lines, including
-HM with type constructor polymorphism and kind polymorphism
+The specification for Mendler-style iteration in Fig.~\ref{fig:mit}
+is only 20 lines, including pattern-matching lambdas $16+20=36$ lines,
+including HM with type constructor polymorphism and kind polymorphism
 the total is $26+16+20=62$ lines of Prolog (excluding empty lines).
 The complete specification, and also a reference implementation, of
 all the features discussed so far fits in only 62 lines of Prolog.
@@ -786,7 +807,8 @@ to be fully applied as a type (e.g. $\textit{List}~\texttt{Nat} : *$).
 \end{align*}
 To support terms, as well as types, to be applied to type constructors
 as arguments, the kind structure needs to be extended.
-System~\Fi\ \cite{AhnSheFioPit13} extends extend the kind structure
+System~\Fi\ \cite{AhnSheFioPit13}, which Nax is based on, extends
+the kind structure
 with $\{A\,\}\to \kappa$ to support term indices in types.
 This extension to kinds allows type constructors with term indicies
 such as $\textit{Vec} : * \to \{\textit{Nat}\,\} \to *$ for vectors
