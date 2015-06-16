@@ -1,17 +1,17 @@
 \section{Introduction}\label{sec:intro}
-When implementing the type system of a programming language we often face a gap between
-the design described on paper and the actual implementation. Sometimes
-there is no formal description but only an ambiguous description in English
-(or in other natural languages). Even when there is a mathematical description
-of the type system on paper, there can be a gap between the type system design
-and implementation. Language designers and implementers can suffer from this gap
-because it is difficult to determine whether a problem originated from a flaw
-in the design or bug in implementation.
-Having a declarative (i.e., structurally similar to the design)
-and flexible (i.e., easily modifiable) machine executable specification
-(or reference implementation) is extremely helpful, especially
-in an early developing state of prototyping or when experimenting with
-possible extensions to the language type system.  
+When implementing the type system of a programming language,
+we often face a gap between the design described on paper and
+the actual implementation. Sometimes there is no formal description
+but only an ambiguous description in English (or in other natural languages).
+Even when there is a mathematical description of the type system on paper,
+there can be a gap between the type system design and implementation.
+Language designers and implementers can suffer from this gap because
+it is difficult to determine whether a problem originated from a flaw
+in the design or a bug in the implementation. Having a declarative
+(i.e., structurally similar to the design)
+and flexible (i.e., easily extensible) machine executable specification
+is extremely helpful, especially in early prototyping stage or
+when experimenting with possible extensions to the language type system.  
 Jones' attempt of \emph{Typing Haskell in Haskell} \cite{JonesTHiH99} is
 an exemplary work that demonstrates the value of such a concise, declarative,
 and machine executable specification:
@@ -21,7 +21,7 @@ only 400+ lines readable Haskell.
 In our case study, we use Prolog to specify advanced polymorphic features of
 modern functional languages. Logic programming languages like Prolog
 are natural candidates for the purpose of specifying type systems
-which support type inference: the syntax and semantics are
+that support type inference: the syntax and semantics are
 designed to represent logical inference rules (which is how type systems
 are typically formalized) and they offer native support for unification (which
 is the basic building block of type inference algorithms). As a result,
@@ -29,31 +29,40 @@ Prolog specifications are usually more succinct than a specification
 using a functional language.
 
 Our contributions are:
-\begin{itemize}\vspace*{-1.75ex}
-\item A declarative and fully functioning type inference implementation
-in much less than 100 lines of Prolog: we only use built-ins and
-fairly basic library functions to specify
-type polymorphism, type constructor polymorphism, kind polymorphism,
-(non-nested) pattern-matching and recursion schemes for non-regular
-algebraic datatypes.
+\begin{itemize}\vspace*{-1ex}
+\item A succint and declarative specification of
+	a type system with several dimensions of polymorphism
+	in less than 30 lines of Prolog (\S\ref{sec:poly}).
+\item An easily extensible specifiation for pragmatic use
+	(as demonstrated in \S\ref{sec:other}):
+We belive our specification is usable without expert knowledge
+in logic programming because we only used built-ins and fairly basic
+library predicates, not relying on any specialized frameworks.
 \item Two-staged inference for types and kinds using delayed goals:
 We discovered that kind inference can be delayed after type inference
 (it is in some sense quite natural) and exploited the fact to get the
-most out of Prolog's native unification in both type inference and
-kind inference (which helped our specification to be more succinct).
+most out of Prolog's native unification in both type and kind inference
+(which helped our specification to be more succinct).
+\item Motivating example for calling support for a dual-view
+on variables in logic programming:
+	Type variables are viewed as unification variables
+	in type inference and as concrete atoimc variables
+	in kind inference in our specification.
+	Better way of organizing this idea is desirable
+	for even better specification.
 \end{itemize}
 
-We give step-by-step tutorial style explanation of our specification in
-\S\ref{sec:poly}, starting from the Prolog specification of
-the simply-typed lambda calculus, which supports no forms of polymorphism.
-In \S\ref{sec:other}, we demonstrate that our method of specification is
-flexible for extensions with other language features.
-All our Prolog specification runs in \S\ref{sec:poly} and \S\ref{sec:other}
-are tested on SWI Prolog 7.2 and available on TODO github url maybl??.
-We discuss future work
-on more challenging language features such as GADTs and term indicies in
-\S\ref{sec:futwork}. We discuss \S\ref{sec:relwork} and
-conclusion --- last paragraph can be revised later.
+We give a step-by-step tutorial style explanation of our specification in
+\S\ref{sec:poly}, gradually extending from the Prolog specification of
+the simply-typed lambda calculus. In \S\ref{sec:other}, we demonstrate
+that our method of specification is flexible for extensions with
+other language features. All our Prolog specification in \S\ref{sec:poly}
+and \S\ref{sec:other} are tested on SWI Prolog 7.2 and its source code is
+available online.\footnote{
+	\url{https://github.com/kyagrd/HMtyInferUsingProlog} }
+We contemplate on more challenging language features such as GADTs and
+term indicies in \S\ref{sec:futwork}, discuss related work in
+\S\ref{sec:relwork}, and summarize our discussion in \S\ref{sec:concl}.
 
 %% oustidein \cite{OutsideInICFP09}
 

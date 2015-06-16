@@ -16,9 +16,9 @@ in logic programming. An AILog\footnote{A logical inference system for designing
 introduces delaying golas as one of the useful abilities of meta-interpreter.
 Many prolog systems, such as SWI or SICStus, provide built-in support for
 delaying a goal untill certiain conditions are met using the predicates
-such as \verb|freeze| or \verb|when|. In our implementation of
-type constructor polymorphism and kind polymorphsim, we cannot
-simiply use freeze or when because we need pre-processng on
+such as \verb|freeze| or \verb|when|. In our specification supporting
+type constructor polymorphism and kind polymorphsim, we could not
+simiply use \verb|freeze| or \verb|when| because we pre-process
 the collected delayed goals (see \verb|variableze| in \S\ref{ssec:HMtck}).
 
 %% delayed goals are not uncommon in logic programming
