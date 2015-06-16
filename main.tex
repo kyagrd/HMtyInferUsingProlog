@@ -819,7 +819,7 @@ might involve resolving possible challenges from these two ramifications.
 We defined in Prolog a type inference implementation for a non-trivial
 type system by making extensive use of Prolog's native support for
 unification, allowing us to obtain a concise and runnable
-specification. In particular we use Prolog's unification variables to
+specification. In particular we use logical variables to
 represent type (or kind) variables in type (or kind) schemas.
 
 We overcame the conflicting view of type variables between type- and
@@ -831,6 +831,10 @@ We also showed the flexibility of this technique by successively
 extending the language with more advanced language features like
 recursive let, pattern matching and Mendler-style iteration.
 
+The use of extra-logical built-ins like \verb|copy_term/2| makes so we
+can exploit Prolog's logical variables not only for unification but
+also to represent binding of quantified type (or kind) variables,
+greatly simplifying the handling of implicit polymorphism.
 
 %% TODO observe
 %% specification
