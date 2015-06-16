@@ -836,6 +836,11 @@ can exploit Prolog's logical variables not only for unification but
 also to represent binding of quantified type (or kind) variables,
 greatly simplifying the handling of implicit polymorphism.
 
+Logical variables can however also limit the predictability of how the
+program is going to behave, since a predicate running on inputs that
+are not ground enough can get stuck.
+
+
 %% TODO observe
 %% specification
 
