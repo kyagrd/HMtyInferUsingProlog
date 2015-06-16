@@ -7,7 +7,7 @@ constraint handling rules (CHR). Testing a type system extension
 in the \HMX\ framework provides a certain level of confidence that the extension
 would work well with type polymorphism in HM. Testing an extension by
 extending our specification provides additional confidence that the extension
-would work will with type constructor polymorphism and kind polymorphism,
+would work well with type constructor polymorphism and kind polymorphism,
 as well as with type polymorphism.
 
 The concept of delayed goals have been used in many different contexts
@@ -30,20 +30,19 @@ the collected delayed goals (see \verb|variableze| in \S\ref{ssec:HMtck}).
 
 There are experimental Prolog implementations that support peculiar features
 such as
-$\lambda$Prolog
+$\lambda$Prolog \cite{nadathur99cade}
 supporting (restricted version of) higher-order unification
 and 
-$\alpha$Prolog
+$\alpha$Prolog \cite{cheney04iclp}
 supporting nominal abstraction in a purely logical setting.
 Such features may help us specify universal quantifications and fresh name
 generations more elegantly, but there is a trade-off for not having the
-pragmatic support (e.g. built-ins for non-logical features) of more widely-used
-and well-maintained systems such as SWI or SICStus; this can be a drawback if
-one wants to use the specification as a reference implementation rather than
-a platform for studying theoretic properties of the type system.
+pragmatic support (e.g. built-ins for extra-logical features, documentation, and
+graphical debugging) of more widely-used and well-maintained systems
+such as SWI or SICStus.
 
 Recently, there has been research on type inference using logic programming
 with non-standard semantics (e.g., corecursive, coinductive, or coalgebraic)
-for object-oriented languages such as fetherweight Java but functoinal langauges
-were left for future work \cite{AnconaLZ08}.
+for object-oriented languages (e.g., featherweight Java) but
+functional languages were left for future work \cite{AnconaLZ08}.
 

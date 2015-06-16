@@ -831,8 +831,11 @@ represent type (or kind) variables in type (or kind) schemas.
 
 We overcame the conflicting view of type variables between type- and
 kind-checking by delaying kind-checking constraints until after
-typechecking is completed and type variables can be made ground and so
-can be used as indexes into the kinding context.
+type checking is completed and type variables can be made ground and so
+can be used as indexes into the kinding context. We believe this could
+have been simplified if there was either a language level support or
+well tailored framework for establishing a dual-view on the variables
+in logic programming.
 
 We also showed the flexibility of this technique by successively
 extending the language with more advanced language features like
@@ -846,18 +849,6 @@ greatly simplifying the handling of implicit polymorphism.
 Logical variables can however also limit the predictability of how the
 program is going to behave, since a predicate running on inputs that
 are not ground enough can get stuck.
-
-
-%% TODO observe
-%% specification
-
-%% TODO clearer picture of how type inference and kind inference
-%% interact with each other
-
-%% TODO although not pure
-%% but does not explicit rely on destructive updates
-%% So there is a degree of being declarative here
-
 
 
 \makeatletter
