@@ -1,5 +1,5 @@
 \section{Introduction}\label{sec:intro}
-When implementing a language type system, we often face a gap between
+When implementing the type system of a programming language we often face a gap between
 the design described on paper and the actual implementation. Sometimes
 there is no formal description but only an ambiguous description in English
 (or in other natural languages). Even when there is a mathematical description
@@ -20,23 +20,23 @@ only 400+ lines readable Haskell.
 
 In our case study, we use Prolog to specify advanced polymorphic features of
 modern functional languages. Logic programming languages like Prolog
-are natural candidates for the purpose of specifying language type systems
-that support type inference because (1) the syntax and semantics are
+are natural candidates for the purpose of specifying type systems
+which support type inference: the syntax and semantics are
 designed to represent logical inference rules (which is how type systems
-are typically formalized) and (2) native support for unification (which
-is the basic building block for type inference algorithms). As a result,
+are typically formalized) and they offer native support for unification (which
+is the basic building block of type inference algorithms). As a result,
 Prolog specifications are usually more succinct than a specification
 using a functional language.
 
 Our contributions are:
 \begin{itemize}\vspace*{-1.75ex}
-\item A declarative and fully functioning type infernce implementation
-in much less than 100 lines of Prolog: We only used bulit-ins and
+\item A declarative and fully functioning type inference implementation
+in much less than 100 lines of Prolog: we only use built-ins and
 fairly basic library functions to specify
 type polymorphism, type constructor polymorphism, kind polymorphism,
-(non-nested) pattern-mathcing and recursion schemes for non-regular
+(non-nested) pattern-matching and recursion schemes for non-regular
 algebraic datatypes.
-\item Two-staged inference for types and kinds using dealyed goals:
+\item Two-staged inference for types and kinds using delayed goals:
 We discovered that kind inference can be delayed after type inference
 (it is in some sense quite natural) and exploited the fact to get the
 most out of Prolog's native unification in both type inference and
