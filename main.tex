@@ -414,10 +414,11 @@ the kinding context (i.e., from \verb|type(C,...)| to \verb|type(KC,C,...)|).
 \end{figure}
 
 The second step is to invoke well-kindedness checks from the necessary
-places among the typing rules. A generic theory of typed lambda calculus
-[TODO cite Pure Type System] indicates that well-kindednss checks
-are required at the formation of function types, that is,
-in the typing rule for lambda expressions (the second rule of \verb|type|).
+places among the typing rules. We follow the formulation of Pure Type
+Systems \cite{Barendregt91}, a generic theory of typed lambda calculi,
+which indicates that well-kindednss checks are required at the
+formation of function types, that is, in the typing rule for lambda
+expressions (the second rule of \verb|type|).
 A straightforward modification for this typing rule would be
 \begin{verbatim}
   type(KC,C,lam(X,E),A->B) :- type(KC,C,[X:mono(A)|C],E,B),
@@ -774,7 +775,7 @@ to aid type inference.
 
 The kind structure needed for type constructor (i.e. higher-kinded) polymorphism is exactly
 the kinds supported in the higher-order polymorphic lambda calculus,
-known as System \Fw\ [TODO cite Fw]. Type constructors in \Fw\ can have
+known as System \Fw\ \cite{girard72thesis}. Type constructors in \Fw\ can have
 types as arguments. For example, the type constructor \textit{List}
 for lists has kind $* \to *$, which means that it needs one type argument
 to be fully applied as a type (e.g. $\textit{List}~\texttt{Nat} : *$).
