@@ -128,8 +128,8 @@ the specification for HM (\S\ref{ssec:HM}), which extends STLC
 with type polymorphism, and then extend the specification to support
 type constructor polymorphism and kind polymorphism (\S\ref{ssec:HMtck}).
 
-All Prolog specifications (Figs.~\ref{fig:STLC}, \ref{fig:HM},
-and \ref{fig:HMtck}) in this section are tested in SWI-Prolog 7.2.
+%% All Prolog specifications (Figs.~\ref{fig:STLC}, \ref{fig:HM},
+%% and \ref{fig:HMtck}) in this section are tested in SWI-Prolog 7.2.
 The following two lines must be loaded into the Prolog system
 before running the Prolog specifications.
 \begin{verbatim}
@@ -161,7 +161,7 @@ the STLC. For instance, the third rule
 is a transcription of the typing rule for applications
 $~~\frac{C\vdash X:A\to B\qquad~~\quad C\vdash Y:A}{C\vdash X\,Y:B}$ in STLC.
 The \verb|first| predicate implements looking up a binding
-(\verb|X:T|) in the typing context (\verb|C|)
+(\verb|X:T|) in the typing context~(\verb|C|)
 by first occurrence of the variable name (\verb|X|).
 In case of repeated variable names, choosing the first occurrence in the context reflects shadowing of bound variables,
 e.g. the term $(\lambda x. \lambda x. x)$ will have only one type schema, the one of $(\lambda x. \lambda y. y)$.
@@ -304,37 +304,22 @@ The Prolog specification of HM is only 8 lines (excluding empty lines).
 
 \subsection{HM + Type Constructor Polymorphism + Kind Polymorphism}
 \label{ssec:HMtck}
-Modern functional languages such as Haskell support rich flavour of
+Modern functional languages such as Haskell support rich flavours of
 polymorphism beyond type polymorphism. For example, consider
-a Haskell function
-\begin{align*}
-&\textit{mkToSet}\;::\;(c~a\to\textit{List}~a) \to (c~a\to\textit{Set}~a)\\
-&\textit{mkToSet}~\;\textit{toList}~=~\textit{list2set}~\circ~\textit{toList}
-\end{align*}
-which takes a function as an argument (\textit{toList}) that maps
-a data structure ($c$) of $a$-values into a \textit{List} of $a$-values and
-produces a function that maps the data structure into a \textit{Set} of
-$a$-values. Assuming we are given the function that converts a list to a set,
-$\textit{list2set} :: \textit{List}~a \to \textit{Set}~a$, we can define 
-\textit{mkToSet} by composing \textit{list2set} with the first argument
-\textit{toList}. The type of \textit{mkToSet} is polymorphic over two
-variables $c$ and $a$. Note that $c$ is a polymorphic variable over
-type constructors, such as \textit{List} or \textit{Set}, that takes
-one type argument. That is, the type of \textit{mkToSet} is polymorphic
-over a type constructor ($c :: *\to*$) as well as over a type ($a :: *$);
-this can be illustrated more clearly using explicit universal quantification
-and kind annotation in the type signature, as follows:\footnote{
-    The Glasgow Haskell Compiler support language extensions to
-    write such explicit annotations in Haskell scripts.
-    }
-\[\textit{mkToSet}\;::\;
-    \forall\,(c :: *\to*)\,(a :: *)\,.\,
-      (c~a\to\textit{List}~a) \to (c~a\to\textit{Set}~a) \; .\]
-We gave explicit type signatures above for the sake of clarity,
-but the type of \textit{mkToSet} can be completely inferred from
-its definition, without the type signature of \textit{mkToSet}.
-In this subsection, we extended the Prolog specification of HM,
-in the previous subsection to support type constructor polymorphism.
+a generic tree datatype
+\[ \textbf{data}~\textit{Tree}~c~a
+  ~=~ \textit{Leaf}\,~a ~\mid~ \textit{Node}~(c~(Tree~c~a)) \]
+where $c$ determines the branching structure at the node and $a$
+determines the type of the value hanging on the leaf. For instance,
+the tree datatype above instantiates to a binary tree
+when $c$ instantiates to a pair constructor and
+a rose tree when $c$ instantiates to a list constructor.
+The type system of Haskell infers that $c$ has kind $*\to*$ and
+$a$ has kind $*$. That is, $c$ is a unary type constructor
+that takes an argument of kind $*$ and $a$ is type. The type system of
+Haskell is also able to infers types for polymorphic functions defined
+over \textit{Tree}s, which may involve polymorphism over type constructors,
+such as $c$, as well as over types, such as $a$.
 
 The Prolog specification in Fig.~\ref{fig:HMtck} implements
 type constructor polymorphism and kind polymorphism, in only 26 lines
@@ -457,7 +442,7 @@ for the rest of the work at the kinding level. Instead of directly invoking
 \verb|kind| in the second rule of \verb|type|, we collect the list of
 all the necessary well-kindedness checks in a list to be handled later.
 This programming technique is known as \emph{delayed goals}
-[TODO cite delayed goals related] in logic programming.
+in logic programming.
 You can also think of it as building up a to-do list or a continuation.
 We add two additional arguments to \verb|type| to manage delayed goals.
 That is, \verb|type| has six arguments, \verb|type(KC,C,E,A,T,Gs,Gs1)|.

@@ -5,20 +5,20 @@ extensions of HM (e.g., records, type classes, intersection types)
 and \citet{tyinferCHR02} implemented \HMX\ using Prolog with
 constraint handling rules (CHR). Testing a type system extension
 in the \HMX\ framework provides a certain level of confidence that the extension
-would work well with type polymoprhism in HM. Testing an extension by
-extending our specification provides additional confidence that the extesion
+would work well with type polymorphism in HM. Testing an extension by
+extending our specification provides additional confidence that the extension
 would work will with type constructor polymorphism and kind polymorphism,
-as well as with type polymorhpism.
+as well as with type polymorphism.
 
-The concept of delayed goals have been used in many differrent context
+The concept of delayed goals have been used in many different contexts
 in logic programming. An AILog\footnote{A logical inference system for designing
 	 intelligent agents.} textbook \cite{AILogTextBook},
-introduces delaying golas as one of the useful abilities of meta-interpreter.
-Many prolog systems, such as SWI or SICStus, provide built-in support for
-delaying a goal untill certiain conditions are met using the predicates
+introduces delaying goals as one of the useful abilities of meta-interpreter.
+Many Prolog systems, such as SWI or SICStus, provide built-in support for
+delaying a goal until a certiain conditions are met using the predicates
 such as \verb|freeze| or \verb|when|. In our specification supporting
-type constructor polymorphism and kind polymorphsim, we could not
-simiply use \verb|freeze| or \verb|when| because we pre-process
+type constructor polymorphism and kind polymorphism, we could not
+simply use \verb|freeze| or \verb|when| because we pre-process
 the collected delayed goals (see \verb|variableze| in \S\ref{ssec:HMtck}).
 
 %% delayed goals are not uncommon in logic programming
@@ -28,17 +28,20 @@ the collected delayed goals (see \verb|variableze| in \S\ref{ssec:HMtck}).
 %%
 %% https://books.google.com/books?id=d2_i0qeP6yUC&pg=PA645&lpg=PA645
 
-There are experimental Prolog implementations that support pecuillar features
+There are experimental Prolog implementations that support peculiar features
 such as
-$\lambda$Prolog supporting (restricted version of) higher-order unification
+$\lambda$Prolog
+supporting (restricted version of) higher-order unification
 and 
-$\alpha$Prolog supporting nominal abstraction in a purely logical setting.
-Such features may help us specify universal quantification or fresh name
-generation more elegantly, but there is a trade-off for not having the
-pragmatic support (e.g. built-ins for non-logical features) of more widely used
+$\alpha$Prolog
+supporting nominal abstraction in a purely logical setting.
+Such features may help us specify universal quantifications and fresh name
+generations more elegantly, but there is a trade-off for not having the
+pragmatic support (e.g. built-ins for non-logical features) of more widely-used
 and well-maintained systems such as SWI or SICStus; this can be a drawback if
-one wants to use the speification as a reference implementation rather than
-for studying meta-theoretic properties of the type system.
+one wants to use the specification as a reference implementation rather than
+a platform for studying theoretic properties of the type system.
+
 Recently, there has been research on type inference using logic programming
 with non-standard semantics (e.g., corecursive, coinductive, or coalgebraic)
 for object-oriented languages such as fetherweight Java but functoinal langauges
