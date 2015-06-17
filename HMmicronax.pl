@@ -2,8 +2,6 @@
 %%%% Hindley Milner + type constructor polymorphism + rank-1 kind poly
 %%%% with single depth non-nested pattern matches
 %%%% Mendler-style iteration over possibly non-regular ADTs but no GADTs
-use_module(library(apply)).
-use_module(librar(gensym)).
 
 :- set_prolog_flag(occurs_check,true).
 :- op(500,yfx,$).
@@ -36,7 +34,7 @@ type(KC,C,mit(X,Is-->T0,Alts),A->T,G,G1) :-
   length(Is,N), length(Es,N), foldl_ap(mu(F),Es,A),
   gensym(r,R), foldl_ap(var(R),Is,RIs),
   KC1 = [R:mono(K)|KC], C1 = [X:poly(C,RIs->T0)|C],
-  G0 = [kind(KC1,F,K->K), kind(KC1,A->T,o) | G], % delay kind goal
+  G0 = [kind(KC,F,K->K), kind(KC,A->T,o) | G], % delay kind goal
   foldl_ap(F,[var(R)|Is],FRIs),
   type_alts(KC1,C1,Alts,FRIs->T,G0,G1).
 
@@ -80,12 +78,11 @@ zip([X|Xs],[Y|Ys],[(X,Y)|Zs]) :- zip(Xs,Ys,Zs).
 zip([],[],[]).
 
 inst_type(KC,poly(C,T),T1,G,G1) :- copy_term(t(C,T),t(C,T1)),
-  G = G1. %%%% I think below should work but somehow not :(
-%%  free_variables(T,Xs), free_variables(T1,Xs1), zip(Xs,Xs1,Ps),
-%%  findall([kind(KC,X,K),kind(KC,X1,K)],(member((X,X1),Ps),X\==X1),Gs),
-%%  flatten(Gs,G0),
-%%  writef("G0 = "), write(G0), nl,
-%%  append(G0,G,G1).
+    free_variables(T,Xs), free_variables(T1,Xs1), zip(Xs,Xs1,Ps),
+    findall([kind(KC,X,K),kind(KC,X1,K)],(member((X,X1),Ps),X\==X1),Gs),
+    flatten(Gs,G0),
+    writef("G0 = "), write(G0), nl,
+    append(G0,G,G1).
 inst_type(KC,mono(T),T,G,G).
 
 instantiate(poly(C,T),T1) :- copy_term(t(C,T),t(C,T1)).
@@ -157,7 +154,6 @@ main(T) :- ctx0(KCtx,Ctx),
   TM_bad = lam(x,X$X),
   TM_e1 = let(id=TM_id,var(id)$var(id)),
   TM_e2 = lam(y,let(x=lam(w,Y),X$X)),
-  %%  TM_e3 = ['N'->Zero,'C'(x,xs)->X] $ (C$Zero$Nil),
   TM_e3 = ['N'->Zero,'C'(x,xs)->X] $ (C$Zero$Nil),
   TM_len = mit(len,['N'->Zero,'C'(x,xs)->Succ$(var(len)$var(xs))]),
   TM_e4 = let(length=TM_len, Cons$ (var(length)$(Cons$Zero$Nil))

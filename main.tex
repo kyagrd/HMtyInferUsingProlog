@@ -631,7 +631,7 @@ type(KC,C,mit(X,Is-->T0,Alts),A->T,G,G1) :-
   length(Is,N), length(Es,N), foldl_ap(mu(F),Es,A),
   is_list(Alts), gensym(r,R), foldl_ap(var(R),Is,RIs),
   KC1 = [R:mono(K)|KC], C1 = [X:poly(C,RIs->T0)|C],
-  G0 = [kind(KC1,F,K->K), kind(KC,A->T,o) | G], % delayed goal
+  G0 = [kind(KC,F,K->K), kind(KC,A->T,o) | G], % delayed goal
   foldl_ap(F,[var(R)|Is],FRIs),
   type_alts(KC1,C1,Alts,FRIs->T,G0,G1).
 
@@ -856,4 +856,38 @@ are not ground enough can get stuck.
 \makeatother
 \bibliographystyle{abbrvnat}
 \bibliography{main}
+
+\section*{Appendix: Bug fixes after submission to APLAS 2015}
+Andrea spotted a bug in Fig.~\ref{fig:HMtck}.
+In Fig.~\ref{fig:HMtck}, there was a line
+in the last \verb|type| predicate rule for mit
+\begin{verbatim}
+G0 = [kind(KC1,F,K->K), kind(KC1,A->T,o) | G], % delayed goal
+\end{verbatim}
+Andrea spotted that the latter KC1 should be KC (i.e., without R in it).
+I just noticed that both |KC1| had to be KC.
+After this bug fix kind checking instantiation for type schemes started
+to work fine (which didn't at the submission, so we left it out).
+Now, we can answer inquiries from reviewers why we didn't have kind checking
+in type scheme instantiation: "Well, we fixed the bug right after submission".
+
+Ki Yung just fixed it on in LaTeX file and in the Prolog code
+(\verb|HMmicronax.pl|) but have not updated Figures and corresponding text
+in the draft with the correct version of type instantiation. Maybe we should
+do this after the APLAS review comes in.
+The correct instantiation for type scheme should be defined as:
+\begin{verbatim}
+inst_type(KC,poly(C,T),T1,G,G1) :- copy_term(t(C,T),t(C,T1)),
+    free_variables(T,Xs), free_variables(T1,Xs1), zip(Xs,Xs1,Ps),
+    findall([kind(KC,X,K), kind(KC,X1,K)],(member((X,X1),Ps),X\==X1),Gs),
+    flatten(Gs,G0), append(G0,G,G1).
+inst_type(KC,mono(T),T,G,G).
+
+zip([X|Xs],[Y|Ys],[(X,Y)|Zs]) :- zip(Xs,Ys,Zs).
+zip([],[],[]).
+\end{verbatim}
+Instantiation for kind schemes can still use the same \verb|instantiate|
+predicate because there are no kind constructor variables, so  all kinds
+have sort $\square$.
+
 \end{document}

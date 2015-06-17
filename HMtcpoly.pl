@@ -1,8 +1,5 @@
 %%%% Hindley Milner + type constructor polymorphism + rank-1 kind poly
 
-%%%% use_module(library(apply)).
-%%%% use_module(library(gensym)).
-
 :- set_prolog_flag(occurs_check,true).
 :- op(500,yfx,$).
 
@@ -15,9 +12,8 @@ type(KC,C,lam(X,E), A->B,G,G1) :- type(KC,[X:mono(A)  |C],E, B,G0,G1),
                                   G0 = [kind(KC,A->B,o) | G]. % delay kind goal
 type(KC,C,X $ Y,       B,G,G1) :- type(KC,C,X,A->B,G, G0),
                                   type(KC,C,Y,A,   G0,G1).
-type(KC,C,let(X=E0,E1),T,G,G1) :- type(KC,C,E0,A,G, G0),
+type(KC,C,let(X=E0,E1),T,G,G1) :- type(KC,C,              E0,A,G, G0),
                                   type(KC,[X:poly(C,A)|C],E1,T,G0,G1).
-%%%% TODO when we have constructors we need patterm matching expression
 
 zip([X|Xs],[Y|Ys],[(X,Y)|Zs]) :- zip(Xs,Ys,Zs).
 zip([],[],[]).
@@ -77,8 +73,5 @@ main(T) :- ctx0(KC,C),
   TM_e1 = let(id=TM_id,var(id)$var(id)),
   TM_e2 = lam(y,let(x=lam(z,Y),X$X)),
   infer_type(KC,C,TM_e2,T).
-
-
-% tested on SWI-Prolog version 6.6.6
 
 %%%% TODO test some poly kinded type consturctors
