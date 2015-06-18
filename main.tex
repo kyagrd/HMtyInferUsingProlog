@@ -866,8 +866,8 @@ in the last \verb|type| predicate rule for mit
 G0 = [kind(KC1,F,K->K), kind(KC1,A->T,o) | G], % delayed goal
 \end{verbatim}
 Andrea spotted that the latter \verb|KC1| should be \verb|KC| (i.e., without R in it).
-I just noticed that both \verb|KC1| had to be \verb|KC|.
-After this bug fix kind checking instantiation for type schemes started
+After submission, Ki Yung noticed that both \verb|KC1| had to be \verb|KC|.
+After this bug fix, kind checking instantiation for type schemes started
 to work fine (which didn't at the submission, so we left it out).
 Now, we can answer inquiries from reviewers why we didn't have kind checking
 in type scheme instantiation: "Well, we fixed the bug right after submission".
