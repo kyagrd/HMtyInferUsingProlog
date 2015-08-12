@@ -37,7 +37,7 @@ type(KC,C,mit(X,Is-->T0,Alts),A->T,G,G1) :-
   KC1 = [R:mono(K)|KC], C1 = [X:poly(C,RIs->T0)|C],
   G0 = [kind(KC,F,K->K), kind(KC,A->T,o) | G], % delay kind goal
   foldl_ap(F,[var(R)|Is],FRIs),
-  type_alts(KC1,C1,Alts,FRIs->T,G0,G1).
+  type_alts(KC1,C1,Alts,FRIs->T,G0,G1), Is=Es.
 
 type_alts(KC,C,[Alt],          A->T,G,G1) :-
   writef("here!!! 8 "),write(Alt),nl,
