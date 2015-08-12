@@ -11,13 +11,14 @@ kind(KC,F $ G, K2) :- kind(KC,F,K1 -> K2), kind(KC,G,K1).
 kind(KC,A -> B,o)  :- kind(KC,A,o), kind(KC,B,o).
 kind(KC,mu(F), K)  :- kind(KC,F,K->K).
 
-type(KC,C,var(X),     T1,G,G ) :- first(X:T,C), inst_type(KC,T,T1,G,G1).
+type(KC,C,var(X),     T1,G,G1) :- first(X:T,C), inst_type(KC,T,T1,G,G1).
 type(KC,C,lam(X,E), A->B,G,G1) :- type(KC,[X:mono(A)|C],E,B,G0,G1),
                                   G0 = [kind(KC,A->B,o) | G]. % delay kind goal
 type(KC,C,X $ Y,       B,G,G1) :- type(KC,C,X,A->B,G, G0),
-                                  type(KC,C,Y,A,   G0,G1).
+                                  type(KC,C,Y,A1,  G0,G1), A=A1.
 type(KC,C,let(X=E0,E1),T,G,G1) :- type(KC,C,E0,A,G, G0),
-                                  type(KC,[X:poly((KC,C),A)|C],E1,T,G0,G1).
+%                                  type(KC,[X:poly((KC,C),A)|C],E1,T,G0,G1).
+                                  type(KC,[X:poly(C,A)|C],E1,T,G0,G1).
 type(KC,C,in(N,E),     T,G,G1) :- type(KC,C,E,T0,G,G1),
                                   % writef("T0 = "), write(T0), nl,
                                   % writef("N = "), write(N), nl,
@@ -39,11 +40,14 @@ type(KC,C,mit(X,Is-->T0,Alts),A->T,G,G1) :-
   type_alts(KC1,C1,Alts,FRIs->T,G0,G1).
 
 type_alts(KC,C,[Alt],          A->T,G,G1) :-
-  writef("here!!! 8"),nl,
+  writef("here!!! 8 "),write(Alt),nl,
+  writef("here!!! 8++ "),write(A->T),nl,
   type_alt(KC,C,Alt,A->T,G,G1),
   writef("here!!! 9"),nl,
   true.
 type_alts(KC,C,[Alt,Alt2|Alts],A->T,G,G1) :-
+  writef("here!!! 6-- "),write(Alt),nl,
+  writef("here!!! 6-- "),write(A->T),nl,
   type_alt(KC,C,Alt,A->T,G,G0),
   writef("here!!! 6"),nl,
   type_alts(KC,C,[Alt2|Alts],A->T,G0,G1),
@@ -55,8 +59,10 @@ type_alt(KC,C,P->E,A->T,G,G1) :- % assume single depth pattern (C x0 .. xn)
   findall(var(X),member(X,Xs),Vs),
   writef("here!!! 3"),nl,
   foldl_ap(var(Ctor),Vs,PE), % PE=var('Cons')$var(x)$var(xs) when E='Cons'(x,xs)
+  writef("here!!! 3++ PE="),write(PE),writef(" A="),write(A),nl,
   findall(X:mono(Tx),member(X,Xs),C1,C), % C1 extends C with bindings for Xs
-  type(KC,C1,PE,A,G,G0),
+  writef("here!!! 4-- "),write(C1),nl,
+  type(KC,C1,PE,A1,G,G0), A=A1,
   writef("here!!! 4"),nl,
   type(KC,C1,E,T,G0,G1),
   writef("here!!! 5"),nl,
@@ -93,8 +99,9 @@ first(X:T,[X1:T1|Zs]) :- X = X1 -> T = T1 ; first(X:T, Zs).
 variablize(var(X)) :- gensym(t,X).
 
 infer_type(KC,C,E,T) :-
+  writef("here!!! 00 "), write(type(KC,C,E,T,[],Gs0)), nl,
   type(KC,C,E,T,[],Gs0), %%% handle delayed kind sanity check below
-  writef("here!!!"),nl,
+  writef("here!!! AA"),nl,
   writef("T = "), write(T), nl,
   writef("KC = "), write(KC), nl,
   writef("C = "), write(C), nl,
@@ -104,14 +111,13 @@ infer_type(KC,C,E,T) :-
   findall(Ty, member(kind(_,Ty,_),Gs), Tys),
   free_variables(Tys,Xs), maplist(variablize,Xs), % replace free tyvar to var(t)
   findall(A:K,member(var(A),Xs),KC1), appendKC(Gs,KC1,Gs1), % extend with KC1 for new vars
+  writef("T = "), write(T), nl,
+  writef("C = "), write(C), nl,
+  writef("KC1 = "), write(KC1), nl,
   writef("Gs1 = "), write(Gs1), nl,
-  writef("here!!!"),nl,
+  writef("here!!! BB"),nl,
   maplist(call,Gs1), % run all goals in Gs1
-  %%%% debugging output
-  %% writef("T = "), write(T), nl,
-  %% writef("C = "), write(C), nl,
-  %% writef("KC1 = "), write(KC1), nl,
-  %% writef("Gs1 = "), write(Gs1), nl,
+  writef("here!!! CC"),nl,
   true.
 
 
@@ -154,7 +160,11 @@ main(T) :- ctx0(KCtx,Ctx),
   TM_bad = lam(x,X$X),
   TM_e1 = let(id=TM_id,var(id)$var(id)),
   TM_e2 = lam(y,let(x=lam(w,Y),X$X)),
+  TM_e3a = (C$Zero$Nil),
+  TM_e3f = ['N'->Zero,'C'(x,xs)->X], %% $ (C$Zero$Nil),
   TM_e3 = ['N'->Zero,'C'(x,xs)->X] $ (C$Zero$Nil),
+  TM_lendumb0 = mit(len,['N'->Zero]),
+  TM_lendumb = mit(len,['N'->Zero,'C'(x,xs)->Zero]),
   TM_len = mit(len,['N'->Zero,'C'(x,xs)->Succ$(var(len)$var(xs))]),
   TM_e4 = let(length=TM_len, Cons$ (var(length)$(Cons$Zero$Nil))
                                  $ (Cons$ (var(length)$(Cons$Nil$Nil)) $ Nil) ),
