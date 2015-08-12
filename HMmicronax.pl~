@@ -166,7 +166,7 @@ main(T) :- ctx0(KCtx,Ctx),
                                           $ lam(ys,var(bsum)$var(ys)$var(f)) )
                                 )
              ]),
-  infer_type(KCtx,Ctx,TM_len,T).
+  infer_type(KCtx,Ctx,TM_e3,T).
 
 % tested on SWI-Prolog version 6.6.6
 
