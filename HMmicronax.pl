@@ -177,7 +177,7 @@ main(T) :- ctx0(KCtx,Ctx),
              ]),
   infer_type(KCtx,Ctx,TM_e5,T).
 
-% tested on SWI-Prolog version 6.6.6
+% tested on SWI-Prolog version 7.2.0
 
 %%%% TODO test some poly kinded type consturctors
 
