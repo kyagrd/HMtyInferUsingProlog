@@ -17,7 +17,6 @@ type(KC,C,lam(X,E), A->B,G,G1) :- type(KC,[X:mono(A)|C],E,B,G0,G1),
 type(KC,C,X $ Y,       B,G,G1) :- type(KC,C,X,A->B,G, G0),
                                   type(KC,C,Y,A1,  G0,G1), A=A1.
 type(KC,C,let(X=E0,E1),T,G,G1) :- type(KC,C,E0,A,G, G0),
-%                                  type(KC,[X:poly((KC,C),A)|C],E1,T,G0,G1).
                                   type(KC,[X:poly(C,A)|C],E1,T,G0,G1).
 type(KC,C,in(N,E),     T,G,G1) :- type(KC,C,E,T0,G,G1),
                                   % writef("T0 = "), write(T0), nl,
@@ -32,12 +31,12 @@ type(KC,C,mit(X,Alts),mu(F)->T,G,G1) :-
   KC1 = [R:mono(o)|KC], C1 = [X:poly(C,var(R)->T)|C],
   type_alts(KC1,C1,Alts,F$var(R)->T,G,G1).
 type(KC,C,mit(X,Is-->T0,Alts),A->T,G,G1) :-
-  length(Is,N), length(Es,N), foldl_ap(mu(F),Es,A),
+  length(Is,N), foldl_ap(mu(F),Is,A),
   gensym(r,R), foldl_ap(var(R),Is,RIs),
   KC1 = [R:mono(K)|KC], C1 = [X:poly(C,RIs->T0)|C],
   G0 = [kind(KC,F,K->K), kind(KC,A->T,o) | G], % delay kind goal
   foldl_ap(F,[var(R)|Is],FRIs),
-  type_alts(KC1,C1,Alts,FRIs->T,G0,G1), Is=Es.
+  type_alts(KC1,C1,Alts,FRIs->T,G0,G1).
 
 type_alts(KC,C,[Alt],          A->T,G,G1) :-
   writef("here!!! 8 "),write(Alt),nl,
