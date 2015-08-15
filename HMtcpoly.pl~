@@ -72,6 +72,6 @@ main(T) :- ctx0(KC,C),
   TM_bad = lam(x,X$X),
   TM_e1 = let(id=TM_id,var(id)$var(id)),
   TM_e2 = lam(y,let(x=lam(z,Y),X$X)),
-  infer_type(KC,C,TM_e5,T).
+  infer_type(KC,C,TM_e2,T).
 
 %%%% TODO test some poly kinded type consturctors
