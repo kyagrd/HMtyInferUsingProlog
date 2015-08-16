@@ -891,13 +891,7 @@ Instantiation for kind schemes can still use the same \verb|instantiate|
 predicate because there are no kind constructor variables, so  all kinds
 have sort $\square$.
 
-Recently (2nd week of Aug) found out that there needs additional change when
-we have \verb|inst_type| for type instantiation with kind sanity checking.
-There are two places to change: type rule for applications
-(\verb|type(KC,C,X$Y,...) :- ...|) and type rule for
-case alternatives (\verb|type_alt|). While fixing this bug
-typing rule mit for non-regular datatype has been a bit simplified
-(eliminated the \verb|Es| variable).
+On flight to Dublin, fixed the bug in \verb|inst_type| and cleared it up.
 The Prolog code in this repository has been updated but not the code
 in the figure of the paper nor the text has been updated yet;
 should be done once the notification comes in from APLAS soon,
