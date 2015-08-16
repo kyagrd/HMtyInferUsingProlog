@@ -15,12 +15,10 @@ type(KC,C,var(X),     T1,G,G1) :- first(X:T,C), inst_type(KC,T,T1,G,G1).
 type(KC,C,lam(X,E), A->B,G,G1) :- type(KC,[X:mono(A)|C],E,B,G0,G1),
                                   G0 = [kind(KC,A->B,o) | G]. % delay kind goal
 type(KC,C,X $ Y,       B,G,G1) :- type(KC,C,X,A->B,G, G0),
-                                  type(KC,C,Y,A1,  G0,G1), A=A1.
+                                  type(KC,C,Y,A,  G0,G1).
 type(KC,C,let(X=E0,E1),T,G,G1) :- type(KC,C,E0,A,G, G0),
                                   type(KC,[X:poly(C,A)|C],E1,T,G0,G1).
 type(KC,C,in(N,E),     T,G,G1) :- type(KC,C,E,T0,G,G1),
-                                  % writef("T0 = "), write(T0), nl,
-                                  % writef("N = "), write(N), nl,
                                   unfold_N_ap(1+N,T0,F,[mu(F)|Is]),
                                   foldl_ap(mu(F),Is,T).
 %%%%% Alts is a pattern lambda. (Alts $ E) is "case E of Alts" in Haskell
@@ -39,34 +37,18 @@ type(KC,C,mit(X,Is-->T0,Alts),A->T,G,G1) :-
   type_alts(KC1,C1,Alts,FRIs->T,G0,G1).
 
 type_alts(KC,C,[Alt],          A->T,G,G1) :-
-  writef("here!!! 8 "),write(Alt),nl,
-  writef("here!!! 8++ "),write(A->T),nl,
-  type_alt(KC,C,Alt,A->T,G,G1),
-  writef("here!!! 9"),nl,
-  true.
+  type_alt(KC,C,Alt,A->T,G,G1).
 type_alts(KC,C,[Alt,Alt2|Alts],A->T,G,G1) :-
-  writef("here!!! 6-- "),write(Alt),nl,
-  writef("here!!! 6-- "),write(A->T),nl,
   type_alt(KC,C,Alt,A->T,G,G0),
-  writef("here!!! 6"),nl,
-  type_alts(KC,C,[Alt2|Alts],A->T,G0,G1),
-  writef("here!!! 7"),nl,
-  true.
+  type_alts(KC,C,[Alt2|Alts],A->T,G0,G1).
 
 type_alt(KC,C,P->E,A->T,G,G1) :- % assume single depth pattern (C x0 .. xn)
   P =.. [Ctor|Xs], upper_atom(Ctor),
   findall(var(X),member(X,Xs),Vs),
-  writef("here!!! 3"),nl,
   foldl_ap(var(Ctor),Vs,PE), % PE=var('Cons')$var(x)$var(xs) when E='Cons'(x,xs)
-  writef("here!!! 3++ PE="),write(PE),writef(" A="),write(A),nl,
   findall(X:mono(Tx),member(X,Xs),C1,C), % C1 extends C with bindings for Xs
-  writef("here!!! 4-- "),write(C1),nl,
-  type(KC,C1,PE,A1,G,G0), A=A1,
-  writef("here!!! 4"),nl,
-  type(KC,C1,E,T,G0,G1),
-  writef("here!!! 5"),nl,
-  writef("P = "),write(P),nl,
-  true.
+  type(KC,C1,PE,A,G,G0),
+  type(KC,C1,E,T,G0,G1).
 
 % assume upper atoms are tycon or con names and lower ones are var names
 upper_atom(A) :- atom(A), atom_chars(A,[C|_]), char_type(C,upper).
@@ -79,15 +61,16 @@ unfold_N_ap(N,E0$E1,E,Es) :-
 foldl_ap(E, []     , E).
 foldl_ap(E0,[E1|Es], E) :- foldl_ap(E0$E1, Es, E).
 
-zip([X|Xs],[Y|Ys],[(X,Y)|Zs]) :- zip(Xs,Ys,Zs).
-zip([],[],[]).
+%% samekinds is a helper predicate for inst_type
+samekinds(KC,[X|Xs],[Y|Ys],Gs,Gs1) :-
+  (X\==Y -> Gs0=[kind(KC,X,K),kind(KC,Y,K)|Gs]; Gs0=Gs),
+  samekinds(KC,Xs,Ys,Gs0,Gs1).
+samekinds(KC,[],[],Gs,Gs).
 
-inst_type(KC,poly(C,T),T1,G,G1) :- copy_term(t(C,T),t(C,T1)),
-    free_variables(T,Xs), free_variables(T1,Xs1), zip(Xs,Xs1,Ps),
-    findall([kind(KC,X,K),kind(KC,X1,K)],(member((X,X1),Ps),X\==X1),Gs),
-    flatten(Gs,G0),
-    writef("G0 = "), write(G0), nl,
-    append(G0,G,G1).
+%%%% T2 may be input (i.e. more speicific) so use fresh variable T1 for copy_term
+inst_type(KC,poly(C,T),T2,G,G1) :- copy_term(t(C,T),t(C,T1)), 
+  free_variables(T,Xs), free_variables(T1,Xs1), % Xs and Xs1 are same length
+  samekinds(KC,Xs,Xs1,G,G1), T1=T2. %% unify T1 T2 later. this trick only here once
 inst_type(KC,mono(T),T,G,G).
 
 instantiate(poly(C,T),T1) :- copy_term(t(C,T),t(C,T1)).
