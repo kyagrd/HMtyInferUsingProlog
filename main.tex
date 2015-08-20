@@ -44,7 +44,8 @@
 \mainmatter  % start of an individual contribution
 
 % first the title is needed
-\title{Executable Specifications of Polymorphic Type Systems using Prolog (in consideration to submit to FLOPS'16)}
+\title{Executable Specifications of Polymorphic Type Systems using Prolog
+  {\small(considering to submit to FLOPS'16)} }
 
 % a short form should be given in case it is too long for the running head
 \titlerunning{A Case Study on Polymorphic Type Inference using Prolog}
@@ -93,15 +94,14 @@ the Hindley--Milner type system (HM) can be formulated using
 logic programming languages such as Prolog. Modern functional
 language implementations such as the Glasgow Haskell Compiler
 supports more extensive flavors of polymorphism beyond Milner's
-theory of type polymorphism in late '70s. In this case study,
-we progressively extend the Prolog specification to include
-more advanced type system features. An interesting development is
-that extending dimensions of polymorphism beyond HM resulted in
-a multi-staged solution: resolve the typing relations first,
-while delaying to resolve kinding relations, and then resolve
-the delayed kinding relations. Our case study shows that Prolog is
-an effective tool for prototyping type inference with rich features
-of polymorphism, and that logic programming could have been even more effective
+theory of type polymorphism in late '70s. We progressively extend
+the Prolog specification to include more advanced type system features.
+An interesting development is that extending dimensions of polymorphism
+beyond HM resulted in a multi-staged solution: resolve the typing relations
+first, while delaying to resolve kinding relations, and then resolve
+the delayed kinding relations. Our work demonstrates that logic programing
+is effective for prototyping polymorphic type systems with rich features of
+polymorphism, and that logic programming could have been even more effective
 for specifying type inference if it were equipped with better theories and
 tools for staged resolution of different relations at different levels.
 \keywords{Hindley--Milner, functional language, type system,
