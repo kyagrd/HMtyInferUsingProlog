@@ -1,0 +1,176 @@
+Dear Ki Yung,
+
+    Below please find reviews for your submission
+A Case Study on Polymorphic Type Inference using Prolog.
+
+    I sincerely hope that these reviews can help you with the next step in your research project and the
+production of a revised paper.
+
+    As I mentioned in the previous email, APLAS 2015 has a poster session (see
+<http://pl.postech.ac.kr/aplas2015/?page_id=150>). Please consider submitting a poster. Hope to see
+you in Pohang in November.
+
+Best regards,
+
+Xinyu
+
+
+----------------------- REVIEW 1 ---------------------
+PAPER: 67
+TITLE: A Case Study on Polymorphic Type Inference using Prolog
+AUTHORS: Ki Yung Ahn and Andrea Vezzosi
+
+OVERALL EVALUATION: 2 (accept)
+REVIEWER'S CONFIDENCE: 3 (medium)
+
+----------- REVIEW -----------
+This paper is a case study into the use of Prolog to specify and execute advanced type system features: in particular, Hindley–Milner polymorphism, type constructor and kind polymorphism, and regular and irregular algebraic datatypes.
+
+The paper begins with a gentle introduction to the approach, providing a typing system both for the simply-typed lambda calculus, and for the lambda calculus with type schemes (Hindley-Milner). The authors clearly describe how the unification occurs in these simple cases. In the following subsection, kind polymorhpism is introduced. There, the unification approach is different - first the (simple) polymorphic typing is performed, and, then, treating the resulting types as constant values, unification can occur to handle the kind polymorphism. The authors describe how this staged approach is natural within logic programming, using the well-established technique of delayed goals. In the third section, the authors demonstrate other extensions in functional programming languages, such as general recursion, pattern matching over algebraic datatypes, and recursion schemes for non-regular algebraic datatypes, which can be specified as orthogonal extensions to the work in the previo!
+ us section. The lattermost is provided in more detail, describing how to encode the user annotations. The specification that includes all the features in the paper comprises 62 lines of (non-dense) Prolog.
+
+
+The paper was very clear in its explanations, following a ``tutorial’’ style. While the related work is mentioned in section 5, the encoding of simply-typed lambda calculus and of the Hindley-Milner type system in Prolog follows closely to [5], which should be cited in sections 2.1 and 2.2. The example in section 2.2 concerns the application of a polymorphic function (the identity) to itself. The typed example in section 2.3 seems to be a recapitulation of the type scheme example in section 2.2. It would be perhaps better to have a more complex kind-polymorphism example in this section, and have slightly less detail on the polymorphic function example in the previous section (as it is simpler and more standard)?
+
+
+
+Minor points:
+p2, "Better way" should read "A better way"
+p4, "STLC specification (Fig. 2)" should read "STLC specification (Fig. 1)"
+p6, "A type that satisfy" should read "A type that satisfies"
+p12, "In Fig. 5 (on p5)," should read "In Fig. 5" (it is not on page 5, and the link is to fig 5)
+"which naturally generalize from regular" should read "which naturally generalizes from regular"
+p14, "indicies," should read "indices,"
+p15, "a predicate running on inputs that are not ground" should read "a predicate running on inputs that are not grounded"
+
+
+----------------------- REVIEW 2 ---------------------
+PAPER: 67
+TITLE: A Case Study on Polymorphic Type Inference using Prolog
+AUTHORS: Ki Yung Ahn and Andrea Vezzosi
+
+OVERALL EVALUATION: 1 (weak accept)
+REVIEWER'S CONFIDENCE: 3 (medium)
+
+----------- REVIEW -----------
+The work presents an executable specification of different polymorphic
+type inference algorithms in Prolog. After introduction, the basic
+Haskell type inference algorithms are presented in Section 2. More
+advanced features (recursive let-bindings, pattern matching, and
+recursion scheme) are integrated in the Prolog specification in
+Section 3. Section 4 discusses future work. Related work is reviewed
+in Section 5. The authors conclude in Section 6.
+
+Logic programming is essentially encoding inference rules of an object
+logic in the meta-logic of logic programming languages. And type
+inference algorithms are essentially inference rules. It is
+interesting to see the connection in this work. The paper presents
+several encodings of type inference rules in Prolog. Such encodings
+could be extended to improve type inference algorithms in statically
+typed languages.
+
+minor comments:
+
+o line -9, pp 6. type (KC, "C," [X:mono(A)|C], E, B) --> remove
+
+o Figure 3, pp 7. Please explain findall, free_varialbes, and maplist.
+
+o line -2, pp 10. "en" element --> an
+
+o line 1, Figure 5, pp 11. G1 --> G0?
+
+
+----------------------- REVIEW 3 ---------------------
+PAPER: 67
+TITLE: A Case Study on Polymorphic Type Inference using Prolog
+AUTHORS: Ki Yung Ahn and Andrea Vezzosi
+
+OVERALL EVALUATION: -1 (weak reject)
+REVIEWER'S CONFIDENCE: 4 (high)
+
+----------- REVIEW -----------
+The paper presents specifications of (polymorphic) type systems
+for variants of lambda calculus in Prolog. The authors argue
+that their specifications are concise and easy to understand, and
+since they are done in prolog, they are also executable, and
+provides type inference for free, in addition to type checking.
+
+The authors illustrate their approaches in stages, starting from
+the simply typed lambda calculus, to Hindley-Milner type system
+with let-polymorphism and kind-polymorphism. The authors also
+discuss possible extensions, eg., with recursive types and
+general algebraic data types.
+Some claimed technical novelties include use of prolog's built-in
+predicate to do type instantiations, overloading of type variables
+and kind variables (so that type/kind instantiations can be done
+by the same procedure), and the use of delayed goals to resolve
+a problem with kind-polymorphism.
+
+Overall the paper is well written and clear. However, there is no
+substantial contributions in terms of research. It shows some
+clever encoding techniques of type inference in prolog, but this
+hardly qualifies as original research.
+Throughout the paper, the authors emphasize how small their
+codes are, but this statistics hides the underlying complexities of the
+language features used in the implementation.
+The main value of a (formal) specification should be in how easy it is
+to reason about such a specification. In that sense, having a specification
+coded up in a logic-based language is an advantage. But the problem
+is that in their implementations, especially the one involving
+type and kind polymorphisms, non-logical (impure) features of prolog
+are used. So their specifications do not translate easily to an formal
+logical statements.
+This compares rather poorly to existing logical frameworks, such as,
+Twelf, Beluga, or Abella (which faciliates reasoning about
+a certain pure subset of lambda prolog), where one gets the benefit
+of both worlds: executable specifications and formal reasoning support
+for the specifications.
+
+One potential benefit of the current implementations over other
+logical frameworks is, as the authors mentioned, is that these
+alternative pure logical frameworks do not have the "pragmatic support
+... of more widely-used and maintained systems such as SWI ..",
+but this hardly matters in this specific context of type inference,
+as it is typically just a small part of an implementation of a language,
+and is normally done using specific algorithms (eg algorithm W).
+
+
+----------------------- REVIEW 4 ---------------------
+PAPER: 67
+TITLE: A Case Study on Polymorphic Type Inference using Prolog
+AUTHORS: Ki Yung Ahn and Andrea Vezzosi
+
+OVERALL EVALUATION: -1 (weak reject)
+REVIEWER'S CONFIDENCE: 3 (medium)
+
+----------- REVIEW -----------
+This paper shows how to encode a Haskell-style polymorphic type
+system, plus pattern matching and recursion schemes, inside Prolog.
+The aforementioned development is achieved in just 62 lines of
+Prolog code. Perhaps the most interesting facet of the development
+is that type and kind inference can be done in a two-staged
+process, using delayed goals, whereby kind inference is deferred
+until after type inference.
+
+This is a nicely written and presented tutorial-style paper. Its
+results seem correct, the explanations for what is going on are
+clear, and, not being an expert in the area of type systems or
+indeed logic programming, I definitely learned something from
+reading it.
+
+It is therefore with something of a heavy heart that I nevertheless
+recommend that the paper be rejected. Although a decent piece of
+scientific writing, the paper - as far as I can tell - does not
+present any significant research content. What is presented seems
+like basically just an exercise in logic programming (albeit one
+that employs some advanced features of the language), and it is not
+clear that we really learn anything new from it. Although the call
+for papers does say explicitly that case studies can be considered
+as regular research papers, I simply don't think the original
+research contribution of this paper is substantial enough to
+warrant acceptance as a full research paper at APLAS.
+
+However, since the paper is nicely written, and since it focuses on
+developing a Prolog implementation of polymorphic types, I suggest
+that it could instead be considered under the "systems and tool
+presentations" category.
