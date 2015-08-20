@@ -95,7 +95,7 @@ logic programming languages such as Prolog. Modern functional
 language implementations such as the Glasgow Haskell Compiler
 supports more extensive flavors of polymorphism beyond Milner's
 theory of type polymorphism in late '70s. We progressively extend
-the Prolog specification to include more advanced type system features.
+the HM specification to include more advanced type system features.
 An interesting development is that extending dimensions of polymorphism
 beyond HM resulted in a multi-staged solution: resolve the typing relations
 first, while delaying to resolve kinding relations, and then resolve
@@ -253,10 +253,10 @@ because the type of \textit{id} would have to unify with its domain:
   type(C,let(X=E0,E1), T) :- type(C,               E0, A),
                              type([X:poly(C,A)|C], E1, T).
   
+  first(K:V,[K1:V1|Xs]) :- K=K1 -> V=V1 ; first(K:V, Xs).
+
   instantiate(poly(CXT,T),T1) :- copy_term(t(CXT,T),t(CXT,T1)).
   instantiate(mono(T),    T).
-  
-  first(K:V,[K1:V1|Xs]) :- K=K1 -> V=V1 ; first(K:V, Xs).
 \end{verbatim}
 \caption{HM in Prolog}
 \label{fig:HM}
@@ -322,13 +322,22 @@ over \textit{Tree}s, which may involve polymorphism over type constructors,
 such as $c$, as well as over types, such as $a$.
 
 The Prolog specification in Fig.~\ref{fig:HMtck} implements
-type constructor polymorphism and kind polymorphism, in only 26 lines
-(excluding empty lines).
-We get kind polymorphism for free because we can reuse
-the same \verb|instantiate| predicate for kinds as well as types;
-this is a delightful side-effect of Prolog not being statically typed.
-Here, we focus our discussion on the modifications to support
-type constructor polymorphism.
+type constructor polymorphism and kind polymorphism, in only 33 lines
+(excluding empty lines). We get kind polymorphism for free because
+we can reuse the same \verb|instantiate| predicate for kinds, which was
+used for types in the HM specification. However, the instantiation for
+types needs to be modified, as in \verb|inst_type|, to ensure that
+the kinds of freshly generated type constructor variables match with
+the corresponding variables in the polymorphic type. For example, each
+each use of $\textit{Node} :\!: \forall c a.\, c (Tree c a) \to Tree c a$
+generates two variables, say $c'$ and $a'$, and the type system should make
+sure that $c'$ has the same kind ($*\to*$) as $c$ has and $a'$ has $a'$
+the same kind ($*$) as $a$ has. The \verb|samekinds| predicate used in
+\verb|inst_type| generates such kinding relations exactly for this reason.
+Other than ensuring same kinds for freshly generated variables,
+\verb|inst_type| instantiates polymorphic types just as \verb|instantiate| does.
+In the remainder of this section, we focus our discussion on the modifications
+to support type constructor polymorphism.
 
 Supporting type constructor variables of
 arbitrary kinds introduces the possibility of ill-kinded type (constructor)
@@ -362,20 +371,30 @@ the kinding context (i.e., from \verb|type(C,...)| to \verb|type(KC,C,...)|).
   kind(KC,var(Z),K1) :- first(Z:K,KC), instantiate(K,K1).
   kind(KC,F $ G, K2) :- kind(KC,F,K1 -> K2), kind(KC,G,K1).
   kind(KC,A -> B,o)  :- kind(KC,A,o), kind(KC,B,o).
-  
-  type(KC,C,var(X),     T1,G,G ) :- first(X:T,C), instantiate(T,T1).
+
+  type(KC,C,var(X),     T1,G,G1) :- first(X:T,C), inst_type(KC,T,T1,G,G1).
   type(KC,C,lam(X,E), A->B,G,G1) :- type(KC,[X:mono(A)|C],E,B,G0,G1),
-                                    G0 = [kind(KC,A->B,o)|G]. % delay goal
+                                    G0 = [kind(KC,A->B,o) | G]. % delay goal
   type(KC,C,X $ Y,       B,G,G1) :- type(KC,C,X,A->B,G, G0),
-                                    type(KC,C,Y,A,   G0,G1).
-  type(KC,C,let(X=E0,E1),T,G,G1) :- type(KC,C,              E0,A,G, G0),
+                                    type(KC,C,Y,A,  G0,G1).
+  type(KC,C,let(X=E0,E1),T,G,G1) :- type(KC,C,E0,A,G, G0),
                                     type(KC,[X:poly(C,A)|C],E1,T,G0,G1).
   
+  first(X:T,[X1:T1|Zs]) :- X = X1 -> T = T1 ; first(X:T, Zs).
+  
   instantiate(poly(C,T),T1) :- copy_term(t(C,T),t(C,T1)).
-  instantiate(mono(T),  T).
+  instantiate(mono(T),T).
   
-  first(K:V,[K1:V1|Xs]) :- K=K1 -> V=V1 ; first(K:V,Xs).
+  inst_type(KC,poly(C,T),T2,G,G1) :- copy_term(t(C,T),t(C,T1)), 
+    free_variables(T,Xs), free_variables(T1,Xs1), % Xs and Xs1 are same length
+    samekinds(KC,Xs,Xs1,G,G1), T1=T2. % unify T1 T2 later (T2 might not be var)
+  inst_type(KC,mono(T),T,G,G).
   
+  samekinds(KC,[X|Xs],[Y|Ys],Gs,Gs1) :- %  helper predicate for inst_type
+    (X\==Y -> Gs0=[kind(KC,X,K),kind(KC,Y,K)|Gs]; Gs0=Gs),
+    samekinds(KC,Xs,Ys,Gs0,Gs1).
+  samekinds(KC,[],[],Gs,Gs).
+
   infer_type(KC,C,E,T) :-
     type(KC,C,E,T,[],Gs0), % 1st stage of typing in this line
     copy_term(Gs0,Gs),     % 2nd stage of kinding from here
@@ -584,7 +603,7 @@ ordinary lambda expressions.
 The specification above for non-nested pattern-matching lambdas
 is only 16 lines. To sum up, the specification for HM extended
 with type constructor polymorphism, kind polymorphism, and
-non-nested pattern matching for algebraic datatypes is in $26+16=42$
+non-nested pattern matching for algebraic datatypes is in $33+16=49$
 lines of Prolog, which is also an executable reference implementation
 of the type system.
 
@@ -627,11 +646,12 @@ type(KC,C,mit(X,Alts),mu(F)->T,G,G1) :-
   is_list(Alts), gensym(r,R),
   KC1 = [R:mono(o)|KC], C1 = [X:poly(C,var(R)->T)|C],
   type_alts(KC1,C1,Alts,F$var(R)->T,G,G1).
+
 type(KC,C,mit(X,Is-->T0,Alts),A->T,G,G1) :-
-  length(Is,N), length(Es,N), foldl_ap(mu(F),Es,A),
-  is_list(Alts), gensym(r,R), foldl_ap(var(R),Is,RIs),
+  length(Is,N), foldl_ap(mu(F),Is,A),
+  gensym(r,R), foldl_ap(var(R),Is,RIs),
   KC1 = [R:mono(K)|KC], C1 = [X:poly(C,RIs->T0)|C],
-  G0 = [kind(KC,F,K->K), kind(KC,A->T,o) | G], % delayed goal
+  G0 = [kind(KC,F,K->K), kind(KC,A->T,o) | G], % delay kind goal
   foldl_ap(F,[var(R)|Is],FRIs),
   type_alts(KC1,C1,Alts,FRIs->T,G0,G1).
 
@@ -744,7 +764,7 @@ are available in the references section at the end of this paper.
 The specification for Mendler-style iteration in Fig.~\ref{fig:mit}
 is only 20 lines, including pattern-matching lambdas $16+20=36$ lines,
 including HM with type constructor polymorphism and kind polymorphism
-the total is $26+16+20=62$ lines of Prolog (excluding empty lines).
+the total is $33+16+20=69$ lines of Prolog (excluding empty lines).
 The complete specification, and also a reference implementation, of
 all the features discussed so far fits in only 62 lines of Prolog.
 
@@ -762,7 +782,7 @@ data constructors should be straightforward.
 We plan to continue our work on two additional features.
 One feature is generalized algebraic datatypes (GADTs)
 and the other is enriching the kind syntax, as in the
-Nax language, to support term-indicies in datatypes,
+Nax language, to support term-indices in datatypes,
 especially in GADTs.
 
 GADTs add complexity of introducing local constraints
@@ -795,7 +815,7 @@ as arguments, the kind structure needs to be extended.
 System~\Fi\ \cite{AhnSheFioPit13}, which Nax is based on, extends
 the kind structure
 with $\{A\,\}\to \kappa$ to support term indices in types.
-This extension to kinds allows type constructors with term indicies
+This extension to kinds allows type constructors with term indices
 such as $\textit{Vec} : * \to \{\textit{Nat}\,\} \to *$ for vectors
 (a.k.a. length indexed lists). For instance,
 $\textit{Vec}~\textit{Bool}~\{8\}$ is a type of boolean vectors of length 8.
@@ -812,7 +832,7 @@ There are two ramifications of term indices being involved in type inference:
   ($A$ in $\{\!A\}\to\kappa$), therefore, kinding rules
   need to invoke typing rules.
 \end{itemize}
-Extending our specification with term indicies, while continuing to serve
+Extending our specification with term indices, while continuing to serve
 as a reference implementation, would be an interesting future work that
 might involve resolving possible challenges from these two ramifications.
 
@@ -896,4 +916,11 @@ The Prolog code in this repository has been updated but not the code
 in the figure of the paper nor the text has been updated yet;
 should be done once the notification comes in from APLAS soon,
 early next week.
+
+Rejected from APLAS and got reviews, planning to submit to FLOPS'16.
+
+Bug fixed source code and their corresponding text is updated in this
+draft now. Next to do is add/revise things regarding the review feedback.
+And also in the FLOPS submission it may be worth using DCG Grammar Rules
+to handle delayed goals more systematically.
 \end{document}
