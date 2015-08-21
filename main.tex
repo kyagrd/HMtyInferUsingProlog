@@ -38,6 +38,11 @@
 \newcommand{\Fw}{\ensuremath{\mathrm{F}_\omega}}
 \newcommand{\Fi}{\ensuremath{\mathrm{F}_i}}
 \newcommand{\HMX}{\ensuremath{\mathrm{HM}(\mathcal{X})}}
+\newcommand{\lProlog}{\ensuremath{\lambda}Prolog}
+\newcommand{\aProlog}{\ensuremath{\alpha}Prolog}
+
+\newcommand{\todo}[1]{{\marginpar{\scriptsize\textcolor{magenta}{#1}}}}
+\newcommand{\TODO}[1]{\textcolor{magenta}{TODO: #1}}
 
 \begin{document}
 
@@ -169,7 +174,7 @@ We assume variable names are given as atoms.\footnote{
     In Prolog, identifiers that start with an uppercase letter or
     an underscore (e.g., \texttt{X}, \texttt{Xs}, or \texttt{\_G1}) are
     variables that could be matched with other terms. Identifiers that
-    startwith a lowercase letter (e.g., \texttt{x}, \texttt{xs}, or
+    start with a lowercase letter (e.g., \texttt{x}, \texttt{xs}, or
     \texttt{i\_am\_atom}) and appear alone (i.e., not as a function symbol
     such as \texttt{f} in \texttt{f(X,Y)}), are atoms, which are
     distinct form atoms with other names or complex terms
@@ -244,6 +249,12 @@ because the type of \textit{id} would have to unify with its domain:
                $A \,\pmb{\doteq}\, A\!\to\!A$}}
   } \; .
 \]
+In the specification of HM (Fig.~\ref{fig:HM}), a monomorphic type
+is represented as \verb|mono(A)|, which corresponds to simply \verb|A|
+in the STLC specification (Fig.~\ref{fig:STLC}), whereas a polymorphic type
+has the form \verb|poly(C,A)|. A typing context in HM may contain
+two kinds of bindings: monomorphic bindings (\verb|X:mono(A)|) and
+polymorphic bindings (\verb|X:poly(C,A)|).
 
 \begin{figure}
 \begin{verbatim}
@@ -261,14 +272,6 @@ because the type of \textit{id} would have to unify with its domain:
 \caption{HM in Prolog}
 \label{fig:HM}
 \end{figure}
-
-In the specification of HM (Fig.~\ref{fig:HM}), a monomorphic type
-is represented as \verb|mono(A)|, which corresponds to simply \verb|A|
-in the STLC specification (Fig.~\ref{fig:HM}), whereas a polymorphic type
-has the form \verb|poly(C,A)|. A typing context in HM may contain
-two kinds of bindings: monomorphic bindings (\verb|X:mono(A)|) and
-polymorphic bindings (\verb|X:poly(C,A)|).
-
 The four rules defining the \verb|type| predicate are almost literal
 transcriptions of the typing rules of HM. The first rule for finding
 a type (\verb|T1|) of a variable expression (\verb|var(X)|) amounts
@@ -322,22 +325,22 @@ over \textit{Tree}s, which may involve polymorphism over type constructors,
 such as $c$, as well as over types, such as $a$.
 
 The Prolog specification in Fig.~\ref{fig:HMtck} implements
-type constructor polymorphism and kind polymorphism, in only 33 lines
+type constructor polymorphism and kind polymorphism, in only 34 lines
 (excluding empty lines). We get kind polymorphism for free because
 we can reuse the same \verb|instantiate| predicate for kinds, which was
 used for types in the HM specification. However, the instantiation for
 types needs to be modified, as in \verb|inst_type|, to ensure that
 the kinds of freshly generated type constructor variables match with
-the corresponding variables in the polymorphic type. For example, each
-each use of $\textit{Node} :\!: \forall c a.\, c (Tree c a) \to Tree c a$
+the corresponding variables in the polymorphic type. For example, each use of
+$\textit{Node}\,::\,
+ \forall\,c\;a\,.\;c\;(\textit{Tree}\;c\;a)\to\textit{Tree}\;c\;a\,$
 generates two variables, say $c'$ and $a'$, and the type system should make
-sure that $c'$ has the same kind ($*\to*$) as $c$ has and $a'$ has $a'$
-the same kind ($*$) as $a$ has. The \verb|samekinds| predicate used in
-\verb|inst_type| generates such kinding relations exactly for this reason.
-Other than ensuring same kinds for freshly generated variables,
-\verb|inst_type| instantiates polymorphic types just as \verb|instantiate| does.
-In the remainder of this section, we focus our discussion on the modifications
-to support type constructor polymorphism.
+sure that $c'$ has the same kind ($*\to*$) as $c$ and $a'$ the same kind ($*$)
+as $a$ has. The \verb|samekinds| predicate used in \verb|inst_type| generates
+such kinding relations exactly for this reason. Other than ensuring same kinds
+for freshly generated variables, \verb|inst_type| instantiates polymorphic types
+just as \verb|instantiate| does. In the remainder of this section, we focus our
+discussion on the modifications to support type constructor polymorphism.
 
 Supporting type constructor variables of
 arbitrary kinds introduces the possibility of ill-kinded type (constructor)
@@ -352,7 +355,7 @@ a well-formed type (of kind \verb|o|) when both \verb|A| and \verb|B|
 are well-formed types (of kind \verb|o|), and a type constructor application
 \verb|F$G| is well-formed when \verb|F| is an arrow kind (\verb|K1->K2|)
 whose codomain matches with the kind (\verb|K1|) of its argument \verb|G|.
-A type that satisfy these three kinding rules are well-formed kinds, 
+A type that satisfies these three kinding rules are well-formed kinds, 
 or well-kinded.
 
 The typing rules (\verb|type|) need some modification from the rules of HM,
@@ -568,7 +571,7 @@ type(KC,C,letrec(X=E0,E1),T,G,G1) :- type(KC,[X:mono(A)  |C],E0,A,G, G0),
 
 We could also allow polymorphic recursion by type annotations
 on the let-bound variable, like we will do for Mendler-style iteration
-over non-regular datatypes \S\ref{ssec:mit}.
+over non-regular datatypes in \S\ref{ssec:mit}.
 
 
 \subsection{Pattern Matching for Algebraic Datatypes}\label{ssec:patlam}
@@ -603,14 +606,14 @@ ordinary lambda expressions.
 The specification above for non-nested pattern-matching lambdas
 is only 16 lines. To sum up, the specification for HM extended
 with type constructor polymorphism, kind polymorphism, and
-non-nested pattern matching for algebraic datatypes is in $33+16=49$
+non-nested pattern matching for algebraic datatypes is in $34+16=50$
 lines of Prolog, which is also an executable reference implementation
 of the type system.
 
 \begin{figure}
 \begin{verbatim}
-type(KC,C,Alts,A->T,G,G1) :- type_alts(KC,C,Alts,A->T,G,G1),
-                             G0 = [kind(KC,A->T,o) | G]. % delayed goal
+type(KC,C,Alts,A->T,G,G1) :- type_alts(KC,C,Alts,A->T,G0,G1),
+                             G0 = [kind(KC,A->T,o) | G]. % delay goal
 
 type_alts(KC,C,[Alt],          A->T,G,G1) :- % assume at least one clause
   type_alt(KC,C,Alt,A->T,G,G1).              % empty list not allowed
@@ -629,7 +632,7 @@ type_alt(KC,C,P->E,A->T,G,G1) :- % assume non-nested single depth pattern
 upper_atom(A) :- atom(A), atom_chars(A,[C|_]), char_type(C,upper).
 lower_atom(A) :- atom(A), atom_chars(A,[C|_]), char_type(C,lower).
 \end{verbatim}
-\vspace*{-1ex}
+\vspace*{-2ex}
 \caption{A Prolog specification of non-nested pattern-matching lambdas
 $\qquad$ (coverage checking not included).}
 \label{fig:patlam}
@@ -681,10 +684,10 @@ Consider the following two recursive datatype declarations in Haskell:
        ~|~  C_{\!B}~a~(\textit{Bush}\;(\textit{Bush}~a))
 \end{align*}
 \textit{List} is a homogeneous list, which is either empty
-or en element tailed by a \textit{List} that contains (zero or more)
+or an element tailed by a \textit{List} that contains (zero or more)
 elements of \emph{the same type as the prior element}.
 \textit{Bush} is a list-like structure that is either empty
-or has en element tailed by a \textit{Bush} that contains (zero or more) 
+or has an element tailed by a \textit{Bush} that contains (zero or more) 
 elements \emph{but their type $(\textit{Bush}~a)$ is different from 
 the type of the prior element $(a)$}.
 The recursive component (\textit{List a} in $C_{\!L}~a~(\textit{List}~a)$),
@@ -740,23 +743,26 @@ uncontrolled general recursion.
 %% \label{fig:mitrule}
 %% \end{figure}
 
-The \verb|mu(F)| appearing in the Prolog specification
-corresponds to the recursive types $\mu F$
-constructed by the fixpoint type operator $\mu$ applied to
-a base structure $F$, which is not recursive by itself.
+The \verb|mu(F)| appearing in the Prolog specification corresponds to
+a recursive type $\mu F$ constructed by the fixpoint type operator $\mu$
+applied to a base structure $F$, which is not recursive by itself.
 Here, we require that $F$ is either a type constructor introduced by
 a (non-recursive) datatype declaration or partial application of
-such a type constructor. We add a kinding rule for the fixpoint type
-operator by adding another rule of the \verb|kind| predicate for \verb|mu(F)|.
+such a type constructor. We add a kinding rule for the fixpoint type operator
+by adding another rule of the \verb|kind| predicate for \verb|mu(F)|.
 The Mendler-style iteration over regular datatypes (\verb|mit(X,Alts)|)
 does not need any type annotation. The Mendler-style iteration over
 non-regular datatypes (\verb|mit(X,Is-->T0,Alts)|) needs an annotation
 (\verb|Is-->T0|) to guide the type inference because it is likely to rely on
-polymorphic recursion. The specification for Mendler-style iteration relies on
-pattern-matching lambdas discussed in the previous subsection. Once we have
-properly set up the kinding context and typing context for the name of
-recursive call (\verb|X|), the rest amounts to inferring types for
-pattern-matching lambdas.
+polymorphic recursion.
+\TODO{Add explanation using Bush example, how the variables including
+  \texttt{Is} and \texttt{T0} in \texttt{Is-->T0} as discussed in conversation
+  with Patrica.}
+
+The specification for Mendler-style iteration relies on pattern-matching lambdas
+discussed in the previous subsection. Once we have properly set up the kinding
+context and typing context for the name of recursive call (\verb|X|), the rest
+amounts to inferring types for pattern-matching lambdas.
 Pointers to further details on Mendler-style recursion
 \cite{vene00phd,AbeMatUus03,AhnShe11} and Nax \cite{Ahn14thesis}
 are available in the references section at the end of this paper.
@@ -764,9 +770,9 @@ are available in the references section at the end of this paper.
 The specification for Mendler-style iteration in Fig.~\ref{fig:mit}
 is only 20 lines, including pattern-matching lambdas $16+20=36$ lines,
 including HM with type constructor polymorphism and kind polymorphism
-the total is $33+16+20=69$ lines of Prolog (excluding empty lines).
+the total is $34+16+20=70$ lines of Prolog (excluding empty lines).
 The complete specification, and also a reference implementation, of
-all the features discussed so far fits in only 62 lines of Prolog.
+all the features discussed so far fits in only 69 lines of Prolog.
 
 A missing part from a typical functional language type system, which
 we have not discussed in this paper, is the initial phase of populating
@@ -868,8 +874,11 @@ greatly simplifying the handling of implicit polymorphism.
 
 Logical variables can however also limit the predictability of how the
 program is going to behave, since a predicate running on inputs that
-are not ground enough can get stuck.
+are not grounded enough can get stuck.
 
+\subsubsection*{Acknowledgements.}
+Thanks to Patricia Johann for insightful discussions that helped us clarifying
+the specification for Mendler-style iteration.
 
 \makeatletter
 \renewcommand\bibsection{\section*\bibname}

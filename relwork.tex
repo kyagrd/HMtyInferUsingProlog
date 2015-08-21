@@ -20,26 +20,25 @@ such as \verb|freeze| or \verb|when|. In our specification supporting
 type constructor polymorphism and kind polymorphism, we could not
 simply use \verb|freeze| or \verb|when| because we pre-process
 the collected delayed goals (see \verb|variableze| in \S\ref{ssec:HMtck}).
-
-%% delayed goals are not uncommon in logic programming
-%% http://artint.info/html/ArtInt_329.html
-%% 
-%% https://books.google.com/books?id=Q4i5edW7IyQC&pg=PA321&lpg=PA321
-%%
-%% https://books.google.com/books?id=d2_i0qeP6yUC&pg=PA645&lpg=PA645
+Recently, \citet{SchDemDesWei13} implemented delimited continutations for Prolog,
+which might be a usful abstraction useful for describing delayed goals used in
+our current specification.
 
 There are experimental Prolog implementations that support peculiar features
-such as
-$\lambda$Prolog \cite{nadathur99cade}
-supporting (restricted version of) higher-order unification
-and 
-$\alpha$Prolog \cite{cheney04iclp}
-supporting nominal abstraction in a purely logical setting.
+such as \aProlog\ \cite{cheney04iclp}
+supporting nominal abstraction in a purely logical setting
+and \lProlog\ \cite{nadathur99cade}
+supporting (restricted version of) higher-order unification.
 Such features may help us specify universal quantifications and fresh name
 generations more elegantly, but there is a trade-off for not having the
 pragmatic support (e.g. built-ins for extra-logical features, documentation, and
 graphical debugging) of more widely-used and well-maintained systems
-such as SWI or SICStus.
+such as SWI or SICStus. In fact, the developer of \aProlog\ attempted to
+implement of HM type inference in \aProlog, which intended to implement a single
+directional type inference rather than a bidirectional relation that could also
+be used for type checking like our specification, but failed to produce a working
+version.\footnote{See \texttt{miniml.apl} in the examples directory of
+	the \aProlog\ distribution (provided in both 0.3 and 0.4 versions). }
 
 Recently, there has been research on type inference using logic programming
 with non-standard semantics (e.g., corecursive, coinductive, or coalgebraic)

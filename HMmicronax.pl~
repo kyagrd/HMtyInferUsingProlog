@@ -91,7 +91,6 @@ appendKC([],_,[]).
 appendKC([kind(KC,X,K)|Gs],KC1,[kind(KC2,X,K)|Gs1]) :-
   append(KC1,KC,KC2), appendKC(Gs,KC1,Gs1).
 
-
 % data B r a = BN | BC a (r(r a))
 % B : (* -> *) -> (* -> *)
 % BN: B r a

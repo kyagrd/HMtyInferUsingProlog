@@ -29,10 +29,10 @@ succinct than a specification using a functional language.
 
 Our contributions are:
 \begin{itemize}\vspace*{-1ex}
-\item A succint and declarative specification of
+\item A succinct and declarative specification of
 	a type system with several dimensions of polymorphism
-	in less than 30 lines of Prolog (\S\ref{sec:poly}).
-\item An easily extensible specifiation for pragmatic use
+	in less than 35 lines of Prolog (\S\ref{sec:poly}).
+\item An easily extensible specification for pragmatic use
 	(as demonstrated in \S\ref{sec:other}):
 We believe our specification is usable without expert knowledge
 in logic programming because we only used built-ins and fairly basic
@@ -41,15 +41,15 @@ library predicates, not relying on any specialized frameworks.
 	(\S\ref{ssec:HMtck}):
 We discovered that kind inference can be delayed after type inference
 (it is in some sense quite natural) and exploited the fact to get the
-most out of Prolog's native unification in both type and kind inference
-(which helped our specification to be more succinct).
+most out of Prolog's native unification in both type and kind inference.
+% (which helped our specification to be more succinct).
 \item A Motivating example for calling support for a dual-view
 	on variables in logic programming:
 Type variables are viewed as unification variables
-in type inference and as concrete atoimc variables
+in type inference but as concrete atomic variables
 in kind inference in our specification.
-Better way of organizing this idea is desirable
-for even better specification.
+% Better way of organizing this idea is desirable
+% for even better specification.
 \end{itemize}
 
 We give a step-by-step tutorial style explanation of our specification in
