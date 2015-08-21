@@ -20,3 +20,4 @@ main(T) :-
   TM_e1 = let(id=TM_id,var(id)$var(id)),
   TM_e2 = lam(y,let(x=lam(z,Y),X$X)),
   type([],TM_e2, T).
+
