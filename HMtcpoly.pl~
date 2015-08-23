@@ -37,9 +37,9 @@ infer_type(KC,C,E,T) :-
   copy_term(Gs0,Gs),
   findall(Ty, member(kind(_,Ty,_),Gs), Tys),
   free_variables(Tys,Xs), maplist(variablize,Xs), % replace free tyvar to var(t)
-  findall(A:K,member(var(A),Xs),KC1), appendKC(Gs,KC1,Gs1), % extend with KC1 for new vars
+  findall(A:K,member(var(A),Xs),KC1),
+  appendKC(Gs,KC1,Gs1), % extend with KC1 for new vars
   maplist(call,Gs1). % run all goals in Gs1
-
 
 appendKC([],_,[]).
 appendKC([kind(KC,X,K)|Gs],KC1,[kind(KC2,X,K)|Gs1]) :-
@@ -69,6 +69,6 @@ main(T) :- ctx0(KC,C),
   TM_bad = lam(x,X$X),
   TM_e1 = let(id=TM_id,var(id)$var(id)),
   TM_e2 = lam(y,let(x=lam(z,Y),X$X)),
-  infer_type(KC,C,TM_e5,T).
+  infer_type(KC,C,TM_e2,T).
 
 %%%% TODO test some poly kinded type consturctors

@@ -38,14 +38,19 @@
 \newcommand{\Fw}{\ensuremath{\mathrm{F}_\omega}}
 \newcommand{\Fi}{\ensuremath{\mathrm{F}_i}}
 \newcommand{\HMX}{\ensuremath{\mathrm{HM}(\mathcal{X})}}
+\newcommand{\lProlog}{\ensuremath{\lambda}Prolog}
+\newcommand{\aProlog}{\ensuremath{\alpha}Prolog}
+
+\newcommand{\todo}[1]{{\marginpar{\scriptsize\textcolor{magenta}{#1}}}}
+\newcommand{\TODO}[1]{\textcolor{magenta}{TODO: #1}}
 
 \begin{document}
 
 \mainmatter  % start of an individual contribution
 
 % first the title is needed
-\title{Executable Specifications of Polymorphic Type Systems using Prolog
-  {\small(considering to submit to FLOPS'16)} }
+\title{Executable Relational Specifications of Polymorphic Type Systems
+  using Prolog \\ {\small(in consideration to submit to FLOPS'16)} }
 
 % a short form should be given in case it is too long for the running head
 \titlerunning{A Case Study on Polymorphic Type Inference using Prolog}
@@ -169,7 +174,7 @@ We assume variable names are given as atoms.\footnote{
     In Prolog, identifiers that start with an uppercase letter or
     an underscore (e.g., \texttt{X}, \texttt{Xs}, or \texttt{\_G1}) are
     variables that could be matched with other terms. Identifiers that
-    startwith a lowercase letter (e.g., \texttt{x}, \texttt{xs}, or
+    start with a lowercase letter (e.g., \texttt{x}, \texttt{xs}, or
     \texttt{i\_am\_atom}) and appear alone (i.e., not as a function symbol
     such as \texttt{f} in \texttt{f(X,Y)}), are atoms, which are
     distinct form atoms with other names or complex terms
@@ -244,6 +249,12 @@ because the type of \textit{id} would have to unify with its domain:
                $A \,\pmb{\doteq}\, A\!\to\!A$}}
   } \; .
 \]
+In the specification of HM (Fig.~\ref{fig:HM}), a monomorphic type
+is represented as \verb|mono(A)|, which corresponds to simply \verb|A|
+in the STLC specification (Fig.~\ref{fig:STLC}), whereas a polymorphic type
+has the form \verb|poly(C,A)|. A typing context in HM may contain
+two kinds of bindings: monomorphic bindings (\verb|X:mono(A)|) and
+polymorphic bindings (\verb|X:poly(C,A)|).
 
 \begin{figure}
 \begin{verbatim}
@@ -255,20 +266,12 @@ because the type of \textit{id} would have to unify with its domain:
   
   first(K:V,[K1:V1|Xs]) :- K=K1 -> V=V1 ; first(K:V, Xs).
 
-  instantiate(poly(CXT,T),T1) :- copy_term(t(CXT,T),t(CXT,T1)).
-  instantiate(mono(T),    T).
+  instantiate(poly(C,T),T1) :- copy_term(t(C,T),t(C,T1)).
+  instantiate(mono(T),  T).
 \end{verbatim}
 \caption{HM in Prolog}
 \label{fig:HM}
 \end{figure}
-
-In the specification of HM (Fig.~\ref{fig:HM}), a monomorphic type
-is represented as \verb|mono(A)|, which corresponds to simply \verb|A|
-in the STLC specification (Fig.~\ref{fig:HM}), whereas a polymorphic type
-has the form \verb|poly(C,A)|. A typing context in HM may contain
-two kinds of bindings: monomorphic bindings (\verb|X:mono(A)|) and
-polymorphic bindings (\verb|X:poly(C,A)|).
-
 The four rules defining the \verb|type| predicate are almost literal
 transcriptions of the typing rules of HM. The first rule for finding
 a type (\verb|T1|) of a variable expression (\verb|var(X)|) amounts
@@ -287,16 +290,16 @@ The built-in predicate \verb|copy_term| makes a copy of the first argument
 and unifies it with the second argument. The copied version is identical to
 the original term except all the Prolog variables have been substituted with
 freshly generated variables. The instantiation a polymorphic type
-\verb|poly(CTX,T)| is implemented as \verb|copy_term(t(CTX,T),t(CTX,T1))|.
-Firstly, a copied version of \verb|t(CTX,T)| is made. Say \verb|t(CTX2,T2)|
-is the copied version with all variables in both \verb|CTX| and \verb|T|
-are freshly renamed in \verb|CTX2| and \verb|T2|. Secondly, \verb|t(CTX2,T2)|
-is unified with \verb|t(CTX,T1)|, which amounts to \verb|CTX2=CTX| and
-\verb|T2=T1|. Because \verb|CTX2| is being unified with the original
-context \verb|CTX|, all freshly generated variables in \verb|CTX2| are
-unified with the original variables in \verb|CTX|. Therefore, only
+\verb|poly(C,T)| is implemented as \verb|copy_term(t(C,T),t(C,T1))|.
+Firstly, a copied version of \verb|t(C,T)| is made. Say \verb|t(C2,T2)|
+is the copied version with all variables in both \verb|C| and \verb|T|
+are freshly renamed in \verb|C2| and \verb|T2|. Secondly, \verb|t(C2,T2)|
+is unified with \verb|t(C,T1)|, which amounts to \verb|C2=C| and
+\verb|T2=T1|. Because \verb|C2| is being unified with the original
+context \verb|C|, all freshly generated variables in \verb|C2| are
+unified with the original variables in \verb|C|. Therefore, only
 the variables in \verb|T| that do not occur in its binding context
-\verb|CTX| shall effectively be freshly instantiated in \verb|T1|.
+\verb|C| shall effectively be freshly instantiated in \verb|T1|.
 This exactly captures generalization and instantiation of
 polymorphic types in HM.
 
@@ -322,22 +325,22 @@ over \textit{Tree}s, which may involve polymorphism over type constructors,
 such as $c$, as well as over types, such as $a$.
 
 The Prolog specification in Fig.~\ref{fig:HMtck} implements
-type constructor polymorphism and kind polymorphism, in only 33 lines
+type constructor polymorphism and kind polymorphism, in only 34 lines
 (excluding empty lines). We get kind polymorphism for free because
 we can reuse the same \verb|instantiate| predicate for kinds, which was
 used for types in the HM specification. However, the instantiation for
 types needs to be modified, as in \verb|inst_type|, to ensure that
 the kinds of freshly generated type constructor variables match with
-the corresponding variables in the polymorphic type. For example, each
-each use of $\textit{Node} :\!: \forall c a.\, c (Tree c a) \to Tree c a$
+the corresponding variables in the polymorphic type. For example, each use of
+$\textit{Node}\,::\,
+ \forall\,c\;a\,.\;c\;(\textit{Tree}\;c\;a)\to\textit{Tree}\;c\;a\,$
 generates two variables, say $c'$ and $a'$, and the type system should make
-sure that $c'$ has the same kind ($*\to*$) as $c$ has and $a'$ has $a'$
-the same kind ($*$) as $a$ has. The \verb|samekinds| predicate used in
-\verb|inst_type| generates such kinding relations exactly for this reason.
-Other than ensuring same kinds for freshly generated variables,
-\verb|inst_type| instantiates polymorphic types just as \verb|instantiate| does.
-In the remainder of this section, we focus our discussion on the modifications
-to support type constructor polymorphism.
+sure that $c'$ has the same kind ($*\to*$) as $c$ and $a'$ the same kind ($*$)
+as $a$ has. The \verb|samekinds| predicate used in \verb|inst_type| generates
+such kinding relations exactly for this reason. Other than ensuring same kinds
+for freshly generated variables, \verb|inst_type| instantiates polymorphic types
+just as \verb|instantiate| does. In the remainder of this section, we focus our
+discussion on the modifications to support type constructor polymorphism.
 
 Supporting type constructor variables of
 arbitrary kinds introduces the possibility of ill-kinded type (constructor)
@@ -352,7 +355,7 @@ a well-formed type (of kind \verb|o|) when both \verb|A| and \verb|B|
 are well-formed types (of kind \verb|o|), and a type constructor application
 \verb|F$G| is well-formed when \verb|F| is an arrow kind (\verb|K1->K2|)
 whose codomain matches with the kind (\verb|K1|) of its argument \verb|G|.
-A type that satisfy these three kinding rules are well-formed kinds, 
+A type that satisfies these three kinding rules are well-formed kinds, 
 or well-kinded.
 
 The typing rules (\verb|type|) need some modification from the rules of HM,
@@ -471,10 +474,9 @@ the list of delayed goals after invoking \verb|type|. These two arguments
 are threaded through the recursive definition of
 the \verb|type| predicate.\footnote{
   Experienced Prolog programmer would use
-  \emph{DCG Grammer rules} \cite{SWIPrologManual} to abstract away
-  such extra arguments for accumulated differences.
-  Here, we choose to stick to basic constructs to be more accessible,
-  relying less on Prolog idioms and libraries.}
+  \emph{DCG Grammar rules} \cite{SWIPrologManual} to abstract away such
+  extra arguments for accumulated differences. The specifications using DCG
+  is available online at \url{https://github.com/kyagrd/HMtyInferUsingProlog}}
 
 The \verb|infer_type| predicate implements the two-staged solution,
 as follows:
@@ -568,7 +570,7 @@ type(KC,C,letrec(X=E0,E1),T,G,G1) :- type(KC,[X:mono(A)  |C],E0,A,G, G0),
 
 We could also allow polymorphic recursion by type annotations
 on the let-bound variable, like we will do for Mendler-style iteration
-over non-regular datatypes \S\ref{ssec:mit}.
+over non-regular datatypes in \S\ref{ssec:mit}.
 
 
 \subsection{Pattern Matching for Algebraic Datatypes}\label{ssec:patlam}
@@ -603,14 +605,14 @@ ordinary lambda expressions.
 The specification above for non-nested pattern-matching lambdas
 is only 16 lines. To sum up, the specification for HM extended
 with type constructor polymorphism, kind polymorphism, and
-non-nested pattern matching for algebraic datatypes is in $33+16=49$
+non-nested pattern matching for algebraic datatypes is in $34+16=50$
 lines of Prolog, which is also an executable reference implementation
 of the type system.
 
 \begin{figure}
 \begin{verbatim}
-type(KC,C,Alts,A->T,G,G1) :- type_alts(KC,C,Alts,A->T,G,G1),
-                             G0 = [kind(KC,A->T,o) | G]. % delayed goal
+type(KC,C,Alts,A->T,G,G1) :- type_alts(KC,C,Alts,A->T,G0,G1),
+                             G0 = [kind(KC,A->T,o) | G]. % delay goal
 
 type_alts(KC,C,[Alt],          A->T,G,G1) :- % assume at least one clause
   type_alt(KC,C,Alt,A->T,G,G1).              % empty list not allowed
@@ -629,7 +631,7 @@ type_alt(KC,C,P->E,A->T,G,G1) :- % assume non-nested single depth pattern
 upper_atom(A) :- atom(A), atom_chars(A,[C|_]), char_type(C,upper).
 lower_atom(A) :- atom(A), atom_chars(A,[C|_]), char_type(C,lower).
 \end{verbatim}
-\vspace*{-1ex}
+\vspace*{-2ex}
 \caption{A Prolog specification of non-nested pattern-matching lambdas
 $\qquad$ (coverage checking not included).}
 \label{fig:patlam}
@@ -681,10 +683,10 @@ Consider the following two recursive datatype declarations in Haskell:
        ~|~  C_{\!B}~a~(\textit{Bush}\;(\textit{Bush}~a))
 \end{align*}
 \textit{List} is a homogeneous list, which is either empty
-or en element tailed by a \textit{List} that contains (zero or more)
+or an element tailed by a \textit{List} that contains (zero or more)
 elements of \emph{the same type as the prior element}.
 \textit{Bush} is a list-like structure that is either empty
-or has en element tailed by a \textit{Bush} that contains (zero or more) 
+or has an element tailed by a \textit{Bush} that contains (zero or more) 
 elements \emph{but their type $(\textit{Bush}~a)$ is different from 
 the type of the prior element $(a)$}.
 The recursive component (\textit{List a} in $C_{\!L}~a~(\textit{List}~a)$),
@@ -740,23 +742,26 @@ uncontrolled general recursion.
 %% \label{fig:mitrule}
 %% \end{figure}
 
-The \verb|mu(F)| appearing in the Prolog specification
-corresponds to the recursive types $\mu F$
-constructed by the fixpoint type operator $\mu$ applied to
-a base structure $F$, which is not recursive by itself.
+The \verb|mu(F)| appearing in the Prolog specification corresponds to
+a recursive type $\mu F$ constructed by the fixpoint type operator $\mu$
+applied to a base structure $F$, which is not recursive by itself.
 Here, we require that $F$ is either a type constructor introduced by
 a (non-recursive) datatype declaration or partial application of
-such a type constructor. We add a kinding rule for the fixpoint type
-operator by adding another rule of the \verb|kind| predicate for \verb|mu(F)|.
+such a type constructor. We add a kinding rule for the fixpoint type operator
+by adding another rule of the \verb|kind| predicate for \verb|mu(F)|.
 The Mendler-style iteration over regular datatypes (\verb|mit(X,Alts)|)
 does not need any type annotation. The Mendler-style iteration over
 non-regular datatypes (\verb|mit(X,Is-->T0,Alts)|) needs an annotation
 (\verb|Is-->T0|) to guide the type inference because it is likely to rely on
-polymorphic recursion. The specification for Mendler-style iteration relies on
-pattern-matching lambdas discussed in the previous subsection. Once we have
-properly set up the kinding context and typing context for the name of
-recursive call (\verb|X|), the rest amounts to inferring types for
-pattern-matching lambdas.
+polymorphic recursion.
+\TODO{Add explanation using Bush example, how the variables including
+  \texttt{Is} and \texttt{T0} in \texttt{Is-->T0} as discussed in conversation
+  with Patrica.}
+
+The specification for Mendler-style iteration relies on pattern-matching lambdas
+discussed in the previous subsection. Once we have properly set up the kinding
+context and typing context for the name of recursive call (\verb|X|), the rest
+amounts to inferring types for pattern-matching lambdas.
 Pointers to further details on Mendler-style recursion
 \cite{vene00phd,AbeMatUus03,AhnShe11} and Nax \cite{Ahn14thesis}
 are available in the references section at the end of this paper.
@@ -764,9 +769,9 @@ are available in the references section at the end of this paper.
 The specification for Mendler-style iteration in Fig.~\ref{fig:mit}
 is only 20 lines, including pattern-matching lambdas $16+20=36$ lines,
 including HM with type constructor polymorphism and kind polymorphism
-the total is $33+16+20=69$ lines of Prolog (excluding empty lines).
+the total is $34+16+20=70$ lines of Prolog (excluding empty lines).
 The complete specification, and also a reference implementation, of
-all the features discussed so far fits in only 62 lines of Prolog.
+all the features discussed so far fits in only 69 lines of Prolog.
 
 A missing part from a typical functional language type system, which
 we have not discussed in this paper, is the initial phase of populating
@@ -868,8 +873,11 @@ greatly simplifying the handling of implicit polymorphism.
 
 Logical variables can however also limit the predictability of how the
 program is going to behave, since a predicate running on inputs that
-are not ground enough can get stuck.
+are not grounded enough can get stuck.
 
+\subsubsection*{Acknowledgements.}
+Thanks to Patricia Johann for insightful discussions that helped us clarifying
+the specification for Mendler-style iteration.
 
 \makeatletter
 \renewcommand\bibsection{\section*\bibname}
@@ -877,50 +885,6 @@ are not ground enough can get stuck.
 \bibliographystyle{abbrvnat}
 \bibliography{main}
 
-\newpage
-\section*{Appendix: Bug fixes after submission to APLAS 2015}
-Andrea spotted a bug in Fig.~\ref{fig:HMtck}.
-In Fig.~\ref{fig:HMtck}, there was a line
-in the last \verb|type| predicate rule for mit
-\begin{verbatim}
-G0 = [kind(KC1,F,K->K), kind(KC1,A->T,o) | G], % delayed goal
-\end{verbatim}
-Andrea spotted that the latter \verb|KC1| should be \verb|KC| (i.e., without R in it).
-After submission, Ki Yung noticed that both \verb|KC1| had to be \verb|KC|.
-After this bug fix, kind checking instantiation for type schemes started
-to work fine (which didn't at the submission, so we left it out).
-Now, we can answer inquiries from reviewers why we didn't have kind checking
-in type scheme instantiation: "Well, we fixed the bug right after submission".
-
-Ki Yung just fixed it on in LaTeX file and in the Prolog code
-(\verb|HMmicronax.pl|) but have not updated Figures and corresponding text
-in the draft with the correct version of type instantiation. Maybe we should
-do this after the APLAS review comes in.
-The correct instantiation for type scheme should be defined as:
-\begin{verbatim}
-inst_type(KC,poly(C,T),T1,G,G1) :- copy_term(t(C,T),t(C,T1)),
-    free_variables(T,Xs), free_variables(T1,Xs1), zip(Xs,Xs1,Ps),
-    findall([kind(KC,X,K), kind(KC,X1,K)],(member((X,X1),Ps),X\==X1),Gs),
-    flatten(Gs,G0), append(G0,G,G1).
-inst_type(KC,mono(T),T,G,G).
-
-zip([X|Xs],[Y|Ys],[(X,Y)|Zs]) :- zip(Xs,Ys,Zs).
-zip([],[],[]).
-\end{verbatim}
-Instantiation for kind schemes can still use the same \verb|instantiate|
-predicate because there are no kind constructor variables, so  all kinds
-have sort $\square$.
-
-On flight to Dublin, fixed the bug in \verb|inst_type| and cleared it up.
-The Prolog code in this repository has been updated but not the code
-in the figure of the paper nor the text has been updated yet;
-should be done once the notification comes in from APLAS soon,
-early next week.
-
-Rejected from APLAS and got reviews, planning to submit to FLOPS'16.
-
-Bug fixed source code and their corresponding text is updated in this
-draft now. Next to do is add/revise things regarding the review feedback.
-And also in the FLOPS submission it may be worth using DCG Grammar Rules
-to handle delayed goals more systematically.
+%% \newpage
+%% \section*{Appendix: TODO}
 \end{document}
