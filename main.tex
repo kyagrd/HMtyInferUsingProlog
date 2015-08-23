@@ -885,50 +885,6 @@ the specification for Mendler-style iteration.
 \bibliographystyle{abbrvnat}
 \bibliography{main}
 
-\newpage
-\section*{Appendix: Bug fixes after submission to APLAS 2015}
-Andrea spotted a bug in Fig.~\ref{fig:HMtck}.
-In Fig.~\ref{fig:HMtck}, there was a line
-in the last \verb|type| predicate rule for mit
-\begin{verbatim}
-G0 = [kind(KC1,F,K->K), kind(KC1,A->T,o) | G], % delayed goal
-\end{verbatim}
-Andrea spotted that the latter \verb|KC1| should be \verb|KC| (i.e., without R in it).
-After submission, Ki Yung noticed that both \verb|KC1| had to be \verb|KC|.
-After this bug fix, kind checking instantiation for type schemes started
-to work fine (which didn't at the submission, so we left it out).
-Now, we can answer inquiries from reviewers why we didn't have kind checking
-in type scheme instantiation: "Well, we fixed the bug right after submission".
-
-Ki Yung just fixed it on in LaTeX file and in the Prolog code
-(\verb|HMmicronax.pl|) but have not updated Figures and corresponding text
-in the draft with the correct version of type instantiation. Maybe we should
-do this after the APLAS review comes in.
-The correct instantiation for type scheme should be defined as:
-\begin{verbatim}
-inst_type(KC,poly(C,T),T1,G,G1) :- copy_term(t(C,T),t(C,T1)),
-    free_variables(T,Xs), free_variables(T1,Xs1), zip(Xs,Xs1,Ps),
-    findall([kind(KC,X,K), kind(KC,X1,K)],(member((X,X1),Ps),X\==X1),Gs),
-    flatten(Gs,G0), append(G0,G,G1).
-inst_type(KC,mono(T),T,G,G).
-
-zip([X|Xs],[Y|Ys],[(X,Y)|Zs]) :- zip(Xs,Ys,Zs).
-zip([],[],[]).
-\end{verbatim}
-Instantiation for kind schemes can still use the same \verb|instantiate|
-predicate because there are no kind constructor variables, so  all kinds
-have sort $\square$.
-
-On flight to Dublin, fixed the bug in \verb|inst_type| and cleared it up.
-The Prolog code in this repository has been updated but not the code
-in the figure of the paper nor the text has been updated yet;
-should be done once the notification comes in from APLAS soon,
-early next week.
-
-Rejected from APLAS and got reviews, planning to submit to FLOPS'16.
-
-Bug fixed source code and their corresponding text is updated in this
-draft now. Next to do is add/revise things regarding the review feedback.
-And also in the FLOPS submission it may be worth using DCG Grammar Rules
-to handle delayed goals more systematically.
+%% \newpage
+%% \section*{Appendix: TODO}
 \end{document}

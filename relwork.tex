@@ -22,8 +22,8 @@ type constructor polymorphism and kind polymorphism, we could not
 simply use \verb|freeze| or \verb|when| because we pre-process
 the collected delayed goals (see \verb|variableze| in \S\ref{ssec:HMtck}).
 Recently, \citet{SchDemDesWei13} implemented delimited continutations for Prolog,
-which might be a usful abstraction useful for describing delayed goals used in
-our current specification.
+which might be a usful abstraction for describing the delayed goals used in
+our specification.
 
 \subsection{Other Logic Programming systems}
 There are experimental Prolog implementations that support peculiar features
@@ -34,40 +34,42 @@ quantifications and fresh name generations more elegantly, but there is a
 trade-off for not having the pragmatic support (e.g. built-ins for extra-logical
 features, documentation, and graphical debugging) of more widely-used and
 well-maintained systems such as SWI or SICStus. In fact, the developer of
-\aProlog\ attempted to implement of HM type inference in \aProlog, which
-intended to implement a single directional type inference rather than 
-a bidirectional relation that could also be used for type checking like
-our specification, but failed to produce a working version.\footnote{
+\aProlog\ attempted to implement of HM type inference for mini-ML in \aProlog,
+but failed to produce a working version.\footnote{
 	See \texttt{miniml.apl} in the examples directory of
-	the \aProlog\ distribution (provided in both 0.3 and 0.4 versions). }
-\TODO{\lProlog\ story. There are two things to talk about.
-	One is the type inference implementation in the pcf example
-	distributed with the \lProlog\ implementation.
-	Another one is \url{http://lpcic.gforge.inria.fr/index.html} }.
-
-
+	the \aProlog\ version 0.3 and 0.4 distributions. }
+The Teyjus \lProlog\ compiler version 2 distribution includes an example of
+a PCF implementation in \lProlog, whose polymorphic type inference is similar
+to HM but without polymorphic let-bidings. Both the borken mini-ML implementation
+in \aProlog\ and the working PCF implementation \lProlog\ defines their
+type inference predicate tailored for type inference only, unlike our relational
+description that works for multiple purposes (type checking \& inferernce),
+and the unification used in the mini-ML and PCF implementations are user defined,
+rather than relying on the native unification provided by the logic programming
+systems.
 
 Recently, there has been research on type inference using logic programming
 with non-standard semantics (e.g., corecursive, coinductive, or coalgebraic)
 for object-oriented languages (e.g., featherweight Java) but
 functional languages were left for future work \cite{AL-ECOOP09}.
-
+\TODO{talk about Structural Resolution TODO what to cite?}
 
 \subsection{Descriptions of Type Inference Algorithms in ITPs}
 There are several formal descriptions of type inference algorithms using
-Interactive Theorem Prover(ITP)s such as
-Agda [TODO] and Isabelle/HOL [TODO].
-\TODO{cite the papers regarding Agda and Nominal Isabelle}
-The primoary motivation in such line of work is to formally prove
-theoretical properties (e.g., soundness, principal typing) of a
-type inference algorithm, which is differeent from our motivation of
-providing a human readable \& machine executable specificiation for
-the algorithm to reduce the gap between theoretical specification and
-practical implementation. Describing type inference algorhthms ITPs
-are challenging for two reasons. First, fresh name geneartion should
-be monitored more explicitly and rigourously in order to provide proper
-information for the properties to be formally proven. Second, the algorithm
-must be massaged into a from to convince the termination checker of the ITP.
-As a result, those descriptions tend to divert from the usual desription of
-the algorithm, which is not a relational specification to start with.
+Interactive Theorem Provers (ITPs) such as Coq \cite{Dubois00} and
+Isabelle/HOL \cite{NaraschewskiN-JAR,UrbanN2009}. The primoary motivation
+in such work is to formally prove theoretical properties (e.g., soundness,
+principal typing) of type inference algorithms, which is differeent from
+our motivation of providing a human readable \& machine executable
+specificiation for the algorithm to reduce the gap between
+theoretical specification and practical implementation. Some of those
+descriptions  are not even executable because the unification is merely
+specified as set of logical axioms, only for the sake of proving properties.
+Formally describing certifiable type inference algorhthms ITPs are challenging
+(therefore also challenging to extend or modify) for two reasons. First, fresh
+name geneartion should be monitored more explicitly and rigourously in order to
+provide proper information for the sake of formal proof. Second, some parts of
+the algorithm may need to be massaged into certain froms, differrent from their
+usual represnetations, in order to convince the termination checker of the ITP
+(e.g. \cite{JFP:185139}).
 
