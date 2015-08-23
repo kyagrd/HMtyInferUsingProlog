@@ -49,8 +49,8 @@
 \mainmatter  % start of an individual contribution
 
 % first the title is needed
-\title{Executable Specifications of Polymorphic Type Systems using Prolog
-  {\small(considering to submit to FLOPS'16)} }
+\title{Executable Relational Specifications of Polymorphic Type Systems
+  using Prolog \\ {\small(in consideration to submit to FLOPS'16)} }
 
 % a short form should be given in case it is too long for the running head
 \titlerunning{A Case Study on Polymorphic Type Inference using Prolog}
@@ -266,8 +266,8 @@ polymorphic bindings (\verb|X:poly(C,A)|).
   
   first(K:V,[K1:V1|Xs]) :- K=K1 -> V=V1 ; first(K:V, Xs).
 
-  instantiate(poly(CXT,T),T1) :- copy_term(t(CXT,T),t(CXT,T1)).
-  instantiate(mono(T),    T).
+  instantiate(poly(C,T),T1) :- copy_term(t(C,T),t(C,T1)).
+  instantiate(mono(T),  T).
 \end{verbatim}
 \caption{HM in Prolog}
 \label{fig:HM}
@@ -290,16 +290,16 @@ The built-in predicate \verb|copy_term| makes a copy of the first argument
 and unifies it with the second argument. The copied version is identical to
 the original term except all the Prolog variables have been substituted with
 freshly generated variables. The instantiation a polymorphic type
-\verb|poly(CTX,T)| is implemented as \verb|copy_term(t(CTX,T),t(CTX,T1))|.
-Firstly, a copied version of \verb|t(CTX,T)| is made. Say \verb|t(CTX2,T2)|
-is the copied version with all variables in both \verb|CTX| and \verb|T|
-are freshly renamed in \verb|CTX2| and \verb|T2|. Secondly, \verb|t(CTX2,T2)|
-is unified with \verb|t(CTX,T1)|, which amounts to \verb|CTX2=CTX| and
-\verb|T2=T1|. Because \verb|CTX2| is being unified with the original
-context \verb|CTX|, all freshly generated variables in \verb|CTX2| are
-unified with the original variables in \verb|CTX|. Therefore, only
+\verb|poly(C,T)| is implemented as \verb|copy_term(t(C,T),t(C,T1))|.
+Firstly, a copied version of \verb|t(C,T)| is made. Say \verb|t(C2,T2)|
+is the copied version with all variables in both \verb|C| and \verb|T|
+are freshly renamed in \verb|C2| and \verb|T2|. Secondly, \verb|t(C2,T2)|
+is unified with \verb|t(C,T1)|, which amounts to \verb|C2=C| and
+\verb|T2=T1|. Because \verb|C2| is being unified with the original
+context \verb|C|, all freshly generated variables in \verb|C2| are
+unified with the original variables in \verb|C|. Therefore, only
 the variables in \verb|T| that do not occur in its binding context
-\verb|CTX| shall effectively be freshly instantiated in \verb|T1|.
+\verb|C| shall effectively be freshly instantiated in \verb|T1|.
 This exactly captures generalization and instantiation of
 polymorphic types in HM.
 
@@ -474,10 +474,9 @@ the list of delayed goals after invoking \verb|type|. These two arguments
 are threaded through the recursive definition of
 the \verb|type| predicate.\footnote{
   Experienced Prolog programmer would use
-  \emph{DCG Grammer rules} \cite{SWIPrologManual} to abstract away
-  such extra arguments for accumulated differences.
-  Here, we choose to stick to basic constructs to be more accessible,
-  relying less on Prolog idioms and libraries.}
+  \emph{DCG Grammar rules} \cite{SWIPrologManual} to abstract away such
+  extra arguments for accumulated differences. The specifications using DCG
+  is available online at \url{https://github.com/kyagrd/HMtyInferUsingProlog}}
 
 The \verb|infer_type| predicate implements the two-staged solution,
 as follows:

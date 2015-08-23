@@ -7,33 +7,32 @@ kind(KC,var(Z),K1) :- first(Z:K,KC), instantiate(K,K1).
 kind(KC,F $ G, K2) :- kind(KC,F,K1 -> K2), kind(KC,G,K1).
 kind(KC,A -> B,o)  :- kind(KC,A,o), kind(KC,B,o).
 
-type(KC,C,var(X),     T1,G,G1) :- first(X:T,C), inst_type(KC,T,T1,G,G1).
-type(KC,C,lam(X,E), A->B,G,G1) :- type(KC,[X:mono(A)|C],E,B,G0,G1),
-                                  G0 = [kind(KC,A->B,o) | G]. % delay kind goal
-type(KC,C,X $ Y,       B,G,G1) :- type(KC,C,X,A->B,G, G0),
-                                  type(KC,C,Y,A,  G0,G1).
-type(KC,C,let(X=E0,E1),T,G,G1) :- type(KC,C,E0,A,G, G0),
-                                  type(KC,[X:poly(C,A)|C],E1,T,G0,G1).
+type(KC,C,var(X),     T1) --> { first(X:T,C) }, inst_type(KC,T,T1).
+type(KC,C,lam(X,E), A->B) --> type(KC,[X:mono(A)|C],E,B), [kind(KC,A->B,o)].
+type(KC,C,X $ Y,       B) --> type(KC,C,X,A->B), type(KC,C,Y,A).
+type(KC,C,let(X=E0,E1),T) --> type(KC,C,E0,A), type(KC,[X:poly(C,A)|C],E1,T).
 
-first(X:T,[X1:T1|Zs]) :- X = X1 -> T = T1 ; first(X:T, Zs).
+first(X:T,[X1:T1|Zs]) :- X = X1, T = T1.
+first(X:T,[X1:T1|Zs]) :- X\==X1, first(X:T, Zs).
 
 instantiate(poly(C,T),T1) :- copy_term(t(C,T),t(C,T1)).
 instantiate(mono(T),T).
 
-inst_type(KC,poly(C,T),T2,G,G1) :- copy_term(t(C,T),t(C,T1)), 
-  free_variables(T,Xs), free_variables(T1,Xs1), % Xs and Xs1 are same length
-  samekinds(KC,Xs,Xs1,G,G1), T1=T2. %% unify T1 T2 later (T2 might not be var)
-inst_type(KC,mono(T),T,G,G).
+inst_type(KC,poly(C,T),T2) -->
+  { copy_term(t(C,T),t(C,T1)), 
+    free_variables(T,Xs), free_variables(T1,Xs1) }, % Xs and Xs1 are same length
+  samekinds(KC,Xs,Xs1), { T1=T2 }. %% unify T1 T2 later (T2 might not be var)
+inst_type(KC,mono(T),T) --> [].
 
-samekinds(KC,[X|Xs],[Y|Ys],Gs,Gs1) :- %  helper predicate for inst_type
-  (X\==Y -> Gs0=[kind(KC,X,K),kind(KC,Y,K)|Gs]; Gs0=Gs),
-  samekinds(KC,Xs,Ys,Gs0,Gs1).
-samekinds(KC,[],[],Gs,Gs).
+samekinds(KC,[X|Xs],[Y|Ys]) --> { X\==Y }, [kind(KC,X,K),kind(KC,Y,K)],
+                                samekinds(KC,Xs,Ys).
+samekinds(KC,[X|Xs],[X|Ys]) --> [], samekinds(KC,Xs,Ys).
+samekinds(KC,[],[]) --> [].
 
 variablize(var(X)) :- gensym(t,X).
 
 infer_type(KC,C,E,T) :-
-  type(KC,C,E,T,[],Gs0), %%% handle delayed kind sanity check below
+  phrase( type(KC,C,E,T), Gs0 ), %%% handle delayed kind sanity check below
   copy_term(Gs0,Gs),
   findall(Ty, member(kind(_,Ty,_),Gs), Tys),
   free_variables(Tys,Xs), maplist(variablize,Xs), % replace free tyvar to var(t)

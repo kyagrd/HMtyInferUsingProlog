@@ -9,8 +9,8 @@ type(C,let(X = E0,E1),T) :- type(C,E0,A),type([X:poly(C,A)|C],E1,T).
 instantiate(poly(C,T),T1) :- copy_term(t(C,T),t(C,T1)).
 instantiate(mono(T),T).
 
-first((K:V),[(K1:V1)|Xs]) :- K = K1 -> V = V1 ; first((K:V), Xs).
-
+first(K:V,[K1:V1|Xs]) :- K=K1, V=V1.
+first(K:V,[K1:V1|Xs]) :- K\==K1, first(K:V, Xs). % no cut but using var cmp
 
 main(T) :-
   X = var(x), Y = var(y), Z = var(z),
