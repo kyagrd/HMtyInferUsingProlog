@@ -20,17 +20,20 @@ type(KC,C,in(N,E),     T) --> type(KC,C,E,T0),
                                 foldl_ap(mu(F),Is,T) }.
 %%%%% Alts is a pattern lambda. (Alts $ E) is "case E of Alts" in Haskell
 type(KC,C,     Alts,A->T) --> type_alts(KC,C,Alts,A->T), [kind(KC,A->T,o)].
+
 type(KC,C,mit(X,Alts),mu(F)->T) -->
   { is_list(Alts), gensym(r,R),
     KC1 = [R:mono(o)|KC], C1 = [X:poly(C,var(R)->T)|C] },
   type_alts(KC1,C1,Alts,F$var(R)->T).
+
 type(KC,C,mit(X,Is-->T0,Alts),A->T) -->
-  { length(Is,N), foldl_ap(mu(F),Is,A),
-    gensym(r,R), foldl_ap(var(R),Is,RIs),
+  { is_list(Alts), gensym(r,R),
+    foldl_ap(mu(F),Is,A), foldl_ap(var(R),Is,RIs),
     KC1 = [R:mono(K)|KC], C1 = [X:poly(C,RIs->T0)|C] },
-  [kind(KC,F,K->K), kind(KC,A->T,o)],
+  [kind(KC,F,K->K), kind(KC,A->T,o)], % delayed goals
   { foldl_ap(F,[var(R)|Is],FRIs) },
   type_alts(KC1,C1,Alts,FRIs->T).
+
 
 type_alts(KC,C,[Alt],          A->T) --> type_alt(KC,C,Alt,A->T).
 type_alts(KC,C,[Alt,Alt2|Alts],A->T) --> type_alt(KC,C,Alt,A->T),

@@ -1,4 +1,5 @@
 \section{Related Work}\label{sec:relwork}
+\subsection{A framwrowk for extending HM}
 The idea of using logic programming to specify type inference is not new.
 \citet*{HMX99} defined a general framework called \HMX\ for specifying
 extensions of HM (e.g., records, type classes, intersection types)
@@ -35,9 +36,8 @@ trade-off for not having the pragmatic support (e.g. built-ins for extra-logical
 features, documentation, and graphical debugging) of more widely-used and
 well-maintained systems such as SWI or SICStus. In fact, the developer of
 \aProlog\ attempted to implement of HM type inference for mini-ML in \aProlog,
-but failed to produce a working version.\footnote{
-	See \texttt{miniml.apl} in the examples directory of
-	the \aProlog\ version 0.3 and 0.4 distributions. }
+but failed to produce a working version.\footnote{See \texttt{miniml.apl}
+	in the examples directory of the \aProlog\ version 0.4 or 0.3.}
 The Teyjus \lProlog\ compiler version 2 distribution includes an example of
 a PCF implementation in \lProlog, whose polymorphic type inference is similar
 to HM but without polymorphic let-bidings. Both the borken mini-ML implementation
@@ -53,6 +53,25 @@ with non-standard semantics (e.g., corecursive, coinductive, or coalgebraic)
 for object-oriented languages (e.g., featherweight Java) but
 functional languages were left for future work \cite{AL-ECOOP09}.
 \TODO{talk about Structural Resolution TODO what to cite?}
+
+Kanren\footnote{Kanren is a phonetic transcription of the Kanji word
+	\begin{CJK}{UTF8}{min}{関連}\end{CJK} meaning ``\emph{relation}''.}
+is a delcarative logic programming system embedded in a pure functional subset of
+Scheme. A relational implementation of HM is provided in
+the Kanren repository,\footnote{See \url{http://kanren.sourceforge.net/\#Sample}}
+which works for both type checking and type infernece, and also for
+type inhabitance searching, as in our HM specification in Prolog.
+A simplified version of Kanren called miniKANREN\footnote{
+	\url{http://minikanren.org/} } has been implemented in several dialects
+of Scheme and even further simplified kernel \muKanren\ (microKanren)
+\cite{microKanren} are being implemeted in growing number of host languages as
+embeded Domain Specific Language (eDSL) for logic programming. By design, Kanren
+and its simplified versions do not provide concrete syntax but rely on the syntax
+of their host language. Therefore, Kanren itself is not best suited for
+a speicifcation language, but has its benifits of being flexibile, simple, and
+portable. If one is to build a tool based on logic programming concepts and wants
+to support interfaces to one ore even more programming languages, \muKanren\ may
+be a good choice to targat as the backend.
 
 \subsection{Descriptions of Type Inference Algorithms in ITPs}
 There are several formal descriptions of type inference algorithms using
