@@ -103,7 +103,7 @@ the Hindley--Milner type system (HM) can be formulated using
 logic programming languages such as Prolog. Modern functional
 language implementations such as the Glasgow Haskell Compiler
 supports more extensive flavors of polymorphism beyond Milner's
-theory of type polymorphism in late '70s. We progressively extend
+theory of type polymorphism in the late '70s. We progressively extend
 the HM specification to include more advanced type system features.
 An interesting development is that extending dimensions of polymorphism
 beyond HM resulted in a multi-staged solution: resolve the typing relations
@@ -134,8 +134,8 @@ We start from a Prolog specification for the type system of
 HM (\S\ref{ssec:HM}) and then extend the specification to support
 type constructor polymorphism and kind polymorphism (\S\ref{ssec:HMtck}).
 
-The following two lines must be loaded into the Prolog system
-before running the Prolog specifications. {\small\vspace*{-1ex}
+The following two lines should be loaded into the Prolog system
+before loading the specifications in this paper. {\small\vspace*{-1ex}
 \begin{verbatim}
   :- set_prolog_flag(occurs_check,true).
   :- op(500,yfx,$).
@@ -147,7 +147,7 @@ which is used to represent application operator in the object language syntax.
 For instance, {\small\verb|E1$E2|} is an application of
 {\small\verb|E1|} to {\small\verb|E2|}.
 
-\begin{figure}[t]
+\begin{figure}[b]
 \begin{verbatim}
   type(C,var(X),       T1) :- first(X:T,C), instantiate(T,T1).
   type(C,lam(X,E), A -> B) :- type([X:mono(A)|C],E,B).
@@ -408,16 +408,16 @@ computations appear in curly braces (e.g., \verb|{ first(X:T,C) }|).
 %%   specifications without using DCG are also available on the online repository
 %%   (see \S\ref{sec:intro}, p\pageref{githubURL}). }
 The \verb|infer_type| predicate implements the two-staged solution,
-as follows:\vspace{-1ex}
+as follows:\vspace{-.5ex}
 \begin{itemize}
 \item[1.]
 The 1st line is the first stage at the typing level.
-For example, {\small \vspace*{-1ex}
+For example, {\small \vspace*{-1.1ex}
 \begin{verbatim}
   ?- phrase( type([],[],lam(x,var(x)),T), Gs0 ).
   T = (_G1643->_G1643),
   Gs0 = [kind([], (_G1643->_G1643), o)] .
-\end{verbatim} \vspace*{-1ex} }
+\end{verbatim} \vspace*{-1.1ex} }
 it infers the most generic type ({\small\verb|_G1643->_G1643|})
 of the identity function and generates one delayed goal
 {\;\small\verb|kind([], (_G1643->_G1643), o)|}.
@@ -463,7 +463,7 @@ collected in {\small\verb|Gs1|}. After 7th line, we have
 \end{verbatim} \vspace*{-.7ex} }%
 % It succeeds by inferring that the fresh variable 
 % \verb|var(t1)| must have kind \verb|o|.
-\vspace*{-2ex}
+\vspace*{-1.5ex}
 \end{itemize}
 
 \section{Supporting Other Language Features}\label{sec:other}
@@ -772,14 +772,14 @@ within a pattern-matching clause, which should not escape
 the scope of the clause, unlike global unification constraints in HM.
 It would be interesting to see whether Prolog's built-in support for
 handling unification variables and symbols could help us express
-%% the concept of local constraints.
-%% as elegantly as we expressed
-%% polymorphic instantiation in \S\ref{sec:poly}.
-In addition, more user supplied annotations will be needed,
-even when recursion is not involved, because GADT type inference is
-undecidable \cite{DegtyarevV95} regardless of recursion.
-In Nax, pattern-matching lambdas can have annotations,
-just like the annotations on the Mender-style iteration in \S\ref{ssec:mit}.
+the concept of local constraints.
+as elegantly as we expressed
+polymorphic instantiation in \S\ref{sec:poly}.
+%% In addition, more user supplied annotations will be needed,
+%% even when recursion is not involved, because GADT type inference is
+%% undecidable \cite{DegtyarevV95} regardless of recursion.
+%% In Nax, pattern-matching lambdas can have annotations,
+%% just like the annotations on the Mender-style iteration in \S\ref{ssec:mit}.
 %% to aid type inference.
 
 The kind structure needed for type constructor polymorphism is exactly
@@ -825,7 +825,7 @@ from these two ramifications.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\section{Conclusions}\label{sec:concl}
+\section{Conclusions}\label{sec:concl}\vspace*{-.5ex}
 During this work, we searched for relational specifications of type systems
 that are executable in logic programming systems, only to find out that there
 are surprisingly few (\S\ref{ssec:otherLP}); found few for HM but were not
