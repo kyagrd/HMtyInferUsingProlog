@@ -131,93 +131,22 @@ tools for staged resolution of different relations at different levels.
 \section{Polymorphic type inference specifications in Prolog}
 \label{sec:poly}
 We start from a Prolog specification for the type system of
-simply-typed lambda calculus (STLC) (\S\ref{ssec:STLC})
-and gradually add more features of polymorphism. We discuss
-the specification for HM (\S\ref{ssec:HM}), which extends STLC
-with type polymorphism, and then extend the specification to support
+HM (\S\ref{ssec:HM}) and then extend the specification to support
 type constructor polymorphism and kind polymorphism (\S\ref{ssec:HMtck}).
 
-%% All Prolog specifications (Figs.~\ref{fig:STLC}, \ref{fig:HM},
-%% and \ref{fig:HMtck}) in this section are tested in SWI-Prolog 7.2.
 The following two lines must be loaded into the Prolog system
-before running the Prolog specifications.
+before running the Prolog specifications. {\small\vspace*{-1ex}
 \begin{verbatim}
   :- set_prolog_flag(occurs_check,true).
   :- op(500,yfx,$).
-\end{verbatim} \noindent
-In the first line, \verb|set_prolog_flag(occurs_check,true)|
-sets Prolog's unification operator \verb|=| to perform occurs check.
-For example, \verb|X -> Y = Y| will fail because of occurs check.
-In the second line, \verb|op(500,yfx,$)| declares \verb|$|
-as a left associative infix operator, which is used to represent
-application operator in the object language syntax. For instance,
-\verb|E1 $ E2| is an application of \verb|E1| to
-\verb|E2|.
+\end{verbatim} {\small\vspace*{-.7ex} }\noindent
+The first line sets Prolog's unification operator \verb|=| to perform
+occurs check, which is needed for the correct behavior of type inference.
+The second line declares \verb|$| as a left associative infix operator,
+which is used to represent application operator in the object language syntax.
+For instance, \verb|E1$E2| is an application of \verb|E1| to \verb|E2|.
 
-\subsection{STLC}\label{ssec:STLC}
-The type system of STLC can be specified in 4 lines
-(excluding empty lines) of pure\footnote{
-    Prolog implementations usually support features beyond
-    first-order predicate logic with unification, which are
-    considered impure parts of Prolog. For example,
-    control flow operations such as cut (\texttt{!/0}) or
-    meta-logical operations such as variable test (\texttt{var/1}) are
-    ISO standard Prolog built-ins.} Prolog (Fig.~\ref{fig:STLC}).
-The \verb|type| predicate is self explanatory; its three rule
-definition almost literally transcribes the three typing rules of
-the STLC. For instance, the third rule
-\texttt{\small type(C,X\$Y,B) :- type(C,X,A->B), type(C,Y,A)}
-is a transcription of the typing rule for applications
-$~~\frac{C\vdash X:A\to B\qquad~~\quad C\vdash Y:A}{C\vdash X\,Y:B}$ in STLC.
-The \verb|first| predicate implements looking up a binding
-(\verb|X:T|) in the typing context~(\verb|C|)
-by first occurrence of the variable name (\verb|X|).
-In case of repeated variable names, choosing the first occurrence in the context reflects shadowing of bound variables,
-e.g. the term $(\lambda x. \lambda x. x)$ will have only one type schema, the one of $(\lambda x. \lambda y. y)$.
-We assume variable names are given as atoms.\footnote{
-    In Prolog, identifiers that start with an uppercase letter or
-    an underscore (e.g., \texttt{X}, \texttt{Xs}, or \texttt{\_G1}) are
-    variables, which could be matched with other terms. Identifiers that
-    start with a lowercase letter (e.g., \texttt{x}, \texttt{xs}, or
-    \texttt{i\_am\_atom}) are atoms, which are distinct from atoms with
-    other names or complex terms
-    (e.g., \texttt{f(X,Y)}).} For example, \verb|var(x)| is
-a variable expression whose name is represented by the atom \verb|x|.
-
-\begin{figure}
-\vspace*{-1ex}
-\begin{verbatim}
-  type(C,var(X),       T) :- first(X:T,C).
-  type(C,lam(X,E),A -> B) :- type([X:A|C], E,  B).
-  type(C,X $ Y,        B) :- type(C,X,A -> B), type(C,Y,A).
-
-  first(K:V,[K1:V1|Xs]) :- K=K1, V=V1.
-  first(K:V,[K1:V1|Xs]) :- K\==K1, first(K:V, Xs). 
-\end{verbatim}
-\vspace*{-3ex}
-\caption{Executable Relational Specification of STLC in Prolog}
-\label{fig:STLC}
-\vspace*{-1ex}
-\end{figure}
-
-One great merit of this specification is that it also serves as
-a machine executable reference implementation. We can use Prolog
-to run the specification for type checking, as shown in the following query:
-\begin{verbatim}
-  ?- type([], lam(x,var(x)), A -> A).         
-  true .
-\end{verbatim}\noindent
-and also for type inference, as shown the following query:
-\begin{verbatim}
-  ?- type([], lam(f,lam(x,var(f)$var(x))), T).
-  T = ((_G1861->_G1862)->_G1861->_G1862) .
-\end{verbatim}
-In the following sections, we discuss how to add polymorphic features
-to the specification. The specifications with the extended features
-also serves as machine executable reference implementations, which
-are able to perform both type checking and type inference.
-
-\begin{figure}
+\begin{figure}[t]
 \begin{verbatim}
   type(C,var(X),       T1) :- first(X:T,C), instantiate(T,T1).
   type(C,lam(X,E), A -> B) :- type([X:mono(A)|C],E,B).
@@ -233,50 +162,17 @@ are able to perform both type checking and type inference.
 \vspace*{-3ex}
 \caption{Executable Relational Specification of HM in Prolog}
 \label{fig:HM}
-\vspace*{-1ex}
+\vspace*{-2ex}
 \end{figure}
 \subsection{HM}\label{ssec:HM}
-HM supports rank-1 polymorphic types (a.k.a. type schemes)
-in contrast to STLC, which only support monomorphic types.
-% Polymorphic variable bindings are introduced by let expressions in HM.
-% For example, the following let expression introduces a polymorphic binding
-% for the identity function ($\textit{id}:\forall X.X\to X$):
-% \[\textsf{let}~\textit{id} = (\lambda x. x)
-%   ~\textsf{in}~\textit{id}\;\textit{id} \; .\]
-% This let expression is well-typed in HM because the polymorphic type
-% can be instantiated differently in each occurrence of \textit{id}
-% in the application expression. We distinguish different occurrences by superscripts:
-% \[\frac{\textit{id}:\forall X.X\!\to\!X\vdash
-%           \textit{id}^{\,\textcolor{red}{1}}\! : (\squiggly{A \to A}) \to (A \to A)
-%         \qquad
-%         \textit{id}:\forall X.X\!\to\!X\vdash
-%           \textit{id}^{\,\textcolor{red}{2}}\! : \squiggly{A \to A}
-%        }
-%   {\textit{id}:\forall X.X\!\to\!X\vdash
-%       \textit{id}^{\,\textcolor{red}{1}}\,\textit{id}^{\,\textcolor{red}{2}}
-%       \! : A \to A
-%   } \; .
-% \]
-% If \textit{id} had been bound monomorphically, the application would be ill-typed
-% because the type of \textit{id} would have to unify with its domain: 
-% \[\frac{\textit{id}:A\!\to\!A\vdash
-%           \textit{id}^{\,\textcolor{red}{1}}\! : \!\squiggly{\,A\,}\! \to A
-%         \qquad
-%         \textit{id}:A\!\to\!A\vdash
-%           \textit{id}^{\,\textcolor{red}{2}}\! : \squiggly{A \to A}
-%        }
-%   {\textit{id}:A\!\to\!A\vdash
-%       \textit{id}^{\,\textcolor{red}{1}}\,\textit{id}^{\,\textcolor{red}{2}}
-%       \! : \text{\textcolor{red}{\texttt{ERROR:} cannot unify
-%                $A \,\pmb{\doteq}\, A\!\to\!A$}}
-%   } \; .
-% \]
-In the specification of HM (Fig.~\ref{fig:HM}), a monomorphic type
-is represented as \verb|mono(A)|, which corresponds to simply \verb|A|
-in the STLC specification (Fig.~\ref{fig:STLC}), whereas a polymorphic type
-has the form \verb|poly(C,A)|. A typing context in HM may contain
-two kinds of bindings: monomorphic bindings (\verb|X:mono(A)|) and
+HM supports rank-1 polymorphic types (a.k.a. type schemes), which are
+introduced by polymorphic let-bindings.
+In the specification of HM (Fig.~\ref{fig:HM}), a monomorphic type is
+represented as \verb|mono(A)| and a polymorphic type is represented as
+\verb|poly(C,A)|. A typing context in HM may contain two kinds of bindings:
+monomorphic bindings (\verb|X:mono(A)|) and
 polymorphic bindings (\verb|X:poly(C,A)|).
+%% The Prolog specification of HM is only 8 lines (excluding empty lines).
 
 The four rules defining the \verb|type| predicate are almost literal
 transcriptions of the typing rules of HM. The first rule for finding
@@ -284,8 +180,7 @@ a type (\verb|T1|) of a variable expression (\verb|var(X)|) amounts
 to instantiating (\verb|instantiate(T,T1)|) the type (\verb|T|)
 in the binding (\verb|X:T|) that first matches the variable
 bound in the typing context (\verb|C|).
-The two rules for lambda and application expressions are essentially
-the same as the corresponding rules in STLC.
+The two rules for lambda and application expressions are self explanatory.
 The last rule for let expressions introduce polymorphic bindings.
 Note that a polymorphic biding \verb|poly(C,A)| refers to
 the typing context \verb|C| of the let expression.
@@ -309,7 +204,33 @@ the variables in \verb|T| that do not occur in its binding context
 This exactly captures generalization and instantiation of
 polymorphic types in HM.
 
-The Prolog specification of HM is only 8 lines (excluding empty lines).
+One great merit of this specification is that it also serves as
+a machine executable reference implementation. We can run the specification
+for type checking, as follows: {\small \vspace*{-1ex}
+\begin{verbatim}
+  ?- type([], lam(x,var(x)), A -> A).         
+  true .
+\end{verbatim} \vspace*{-.7ex} }\noindent
+also for type inference: {\small \vspace*{-1ex}
+\begin{verbatim}
+  ?- type([], lam(f,lam(x,var(f)$var(x))), T).
+  T = ((_G1571->_G1572)->_G1571->_G1572) .
+\end{verbatim} \vspace*{-.7ex} }\noindent
+and, although it is not the focus of this work,
+also for type inhabitation: {\small \vspace*{-1ex}
+\begin{verbatim}
+  ?- type([], E, A -> A).
+  E = lam(_G1555, var(_G1555)) .
+\end{verbatim} \vspace*{-.7ex} }
+
+In the following sections, we discuss how to add polymorphic features
+to the specification. The specifications with the extended features
+also serves as machine executable reference implementations, which
+are able to perform both type checking and inference.
+
+
+
+
 
 \subsection{HM + Type Constructor Polymorphism + Kind Polymorphism}
 \label{ssec:HMtck}
@@ -430,21 +351,20 @@ places among the typing rules. We follow the formulation of Pure Type
 Systems \cite{Barendregt91}, a generic theory of typed lambda calculi,
 which indicates that well-kindednss checks are required at the
 formation of function types, that is, in the typing rule for lambda
-expressions (the second rule of \verb|type|).
-A straightforward modification for this typing rule would be
+expressions. One would naturally attempt the following modification:%
+{\small\vspace*{-1ex}
 \begin{verbatim}
   type(KC,C,lam(X,E),A->B) :- type(KC,C,[X:mono(A)|C],E,B),
                               kind(KC,A->B,o).
-\end{verbatim}
+\end{verbatim} \vspace*{-.7ex} }\noindent
 This second step modification is intuitive as a specification, but
 rather fragile as a reference implementation. For instance,
-a simple type inference query for the identity function fails,
-(STLC and HM specifications would have successfully
-inferred its type as \verb|T = A -> A|):
+a simple type inference query for the identity function fails
+(c.f. HM specifications successfully infers \verb|T = A -> A|):{\small \vspace*{-1ex}
 \begin{verbatim}
   ?- type([],[],lam(x,var(x)),T).
   ERROR: Out of local stack
-\end{verbatim}
+\end{verbatim} \vspace*{-.7ex} }
 
 There are mainly two reasons for the erratic behavior.
 Firstly, there is not enough information at the moment of
@@ -466,8 +386,8 @@ the second step. A solution for these two problems mentioned above is
 to stage the control flow: first, get as much information as possible
 at the typing level, and then, concretize Prolog variables with atomic names
 for the rest of the work at the kinding level. Instead of directly invoking
-\verb|kind| in the second rule of \verb|type|, we collect the list of
-all the necessary well-kindedness checks in a list to be handled later.
+\verb|kind| within \verb|type|, we collect the list of all the necessary
+well-kindedness assertions into a list to be handled later.
 This programming technique is known as \emph{delayed goals}
 in logic programming, which is like building up a to-do list or continuation.
 We use the Definite Clause Grammar (DCG) rules \cite{SWIPrologManual}
@@ -483,64 +403,60 @@ computations appear in curly braces (e.g., \verb|{ first(X:T,C) }|).\footnote{
   specifications without using DCG are also available on the online repository
   (see \S\ref{sec:intro}, p\pageref{githubURL}). }
 The \verb|infer_type| predicate implements the two-staged solution,
-as follows:
+as follows:\vspace{-1ex}
 \begin{itemize}
 \item[1.]
-The first line of the definition is the first stage at the typing level.
-For example, when inferring a type for the identity function,
+The 1st line of the definition is the first stage at the typing level.
+For example, {\small \vspace*{-1ex}
 \begin{verbatim}
   ?- phrase( type([],[],lam(x,var(x)),T), Gs0 ).
   T = (_G1643->_G1643),
   Gs0 = [kind([], (_G1643->_G1643), o)] .
-\end{verbatim}
-It infers the most generic type (\verb|_G1643->_G1643|)
+\end{verbatim} \vspace*{-1ex} }
+it infers the most generic type ({\small\verb|_G1643->_G1643|})
 of the identity function and generates one delayed goal
-\verb|kind([], (_G1643->_G1643), o)|.
-\item[2.] From the second line,
+{\;\small\verb|kind([], (_G1643->_G1643), o)|}.
+\item[2.] From the 2nd line,
 we invoke this delayed goal after preprocessing of concertizing
-the type variables. In the second line, we make a copied version of
-the delayed goals using \verb|copy_term| in order to decouple
+the type variables. In the 2nd line, we make a copied version of
+the delayed goals using {\small\verb|copy_term|} in order to decouple
 the variables of the first stage from the variables of the second stage.
-After the second line, \verb|Gs| contains a copied version of \verb|Gs0|
-with freshly renamed variables, say
-\verb|Gs = [kind([], (_G2211->_G2211), o)]|.
+After the 2nd line, {\small\verb|Gs|} contains a copied version of
+{\small\verb|Gs0|} with freshly renamed variables, say
+{\small\verb|Gs = [kind([], (_G2211->_G2211), o)]|}.
 \item[3,4.]
-The third and fourth line of the definition collects all the type variables
-in \verb|Gs| into \verb|Xs|, that is, \verb|Xs = [_G2211]|, continuing with
-our example for the identity function.
+The 3rd and 4th line collects all the type variables
+in {\small\verb|Gs|} into {\small\verb|Xs|}, that is,
+{\small\verb|Xs=[_G2211]|}.
 \item[5.]
-The fifth line \verb|maplist(variablize,Xs)| instantiates
-the Prolog variables collected in \verb|Xs| into
-concrete type variables with fresh names. \verb|variablize|
-implements fresh concrete variable generation using
-a symbol generation library predicate \verb|gensym|.
-Invoking \verb|gensym(t,X)| generates atoms whose fresh names that
-start with \verb|t|. For instance, \verb|X=t1|, \verb|X=t2|, and so on.
-After fifth line, \verb|Xs = [var(t1)]| and
-\verb|Gs = [kind([], (var(t1)->var(t1)), o)]| because 
-the \verb|variablize| predicate has instantiated \verb|_G2211|
-as \verb|_G2211=var(t1)|.
+The 5th line {\small\verb|maplist(variablize,Xs)|} instantiates
+the Prolog variables collected in {\small\verb|Xs|} into concrete
+type variables with fresh names. In {\small\verb|variablize|}, invoking
+{\small\verb|gensym(t,X)|} generates atoms with fresh names that start with
+{\small\verb|t|}. For instance, {\small\verb|X=t1|}, {\small\verb|X=t2|},
+and so on. After 5th line, where it is concretized as
+{\small\verb|_G2211=var(t1)|}, we have {\small\verb|Xs = [var(t1)]|} and
+{\small\verb|Gs = [kind([], (var(t1)->var(t1)), o)]|}.
 \item[6,7.] Freshly generated concrete type variables need to be
-registered to the kinding context before invoking \verb|kind|
-because the first kinding rule requires that type variables must be
-bound in the typing context. The sixth line creates monomorphic
-type bindings for all the variable names in \verb|Xs|, and collects
-them into \verb|KC1|. Continuing with our identity example,
-\verb|KC1 = [t1:mono(K1)]| after the sixth line. The seventh line
-extends each kinding context in the dealyed goal \verb|Gs| with
-the bindings (\verb|KC1|) for the freshly generated variables, 
-where the goals with extended contexts are collected in \verb|Gs1|.
-Ater seventh line, we have 
-\verb|Gs1 = [kind([t1:mono(K1)], (var(t1)->var(t1)), o)]|.
-\item[8.] Finally, we perform the delayed well-kindedness checks by calling
-all the goals in \verb|Gs1|. We can execute the well-kindedness check for
-our identity example by querying
+registered to the kinding context because the first kinding rule requires
+that type variables must be bound in the typing context. The 6th line creates
+monomorphic type bindings for all the variable names in {\small\verb|Xs|},
+and collects them into {\small\verb|KC1|}. Continuing with the identity example,
+{\small\verb|KC1=[t1:mono(K1)]|} after the 6th line. The 7th line
+extends each kinding context in the dealyed goal {\small\verb|Gs|} with
+the bindings ({\small\verb|KC1|}) for the freshly generated variables, 
+where the goals with extended contexts are collected in {\small\verb|Gs1|}.
+After 7th line, we have 
+{\small\verb|Gs1 = [kind([t1:mono(K1)], (var(t1)->var(t1)), o)]|}.
+\item[8.] Finally, the delayed well-kindedness assertions in \verb|Gs1|
+  are called on as goals, which amounts to the following query
+  for our identity function example:{\small
 \begin{verbatim}
   ?- kind([t1:mono(K1)], (var(t1)->var(t1)), o).
   K1 = o
-\end{verbatim}
-The well-kindedness check succeeds by inferring that the freshly generated
-type variable \verb|var(t1)| must have kind \verb|o|.
+\end{verbatim} \vspace*{-.7ex} }
+It succeeds by inferring that the fresh
+type variable \verb|var(t1)| must have kind \verb|o|. \vspace*{-1.5ex}
 \end{itemize}
 
 \section{Supporting Other Language Features}\label{sec:other}
@@ -566,28 +482,15 @@ Adding recursive let-bindings is obvious. Simply add
 a monomorphic binding for the let-bound variable (\verb|X|)
 when inferring the type of the expression (\verb|E0|) defining
 the let-bound value, as follows:
-{\small
+{\small \vspace*{-1ex}
 \begin{verbatim}
   type(KC,C,letrec(X=E0,E1),T) --> type(KC,[X:mono(A)  |C],E0,A),
                                    type(KC,[X:poly(C,A)|C],E1,T).
-\end{verbatim} }
+\end{verbatim} \vspace*{-.7ex} }
 
 We could also allow polymorphic recursion by type annotations
 on the let-bound variable, like we will do for Mendler-style iteration
 over non-regular datatypes in \S\ref{ssec:mit}.
-
-
-\subsection{Pattern Matching for Algebraic Datatypes}\label{ssec:patlam}
-In Fig.\ref{fig:patlam} (on p\pageref{fig:patlam}), we specify
-pattern matching expressions without the scrutinee, which is
-also known as pattern-matching lambdas. A pattern lambda is
-a function that awaits an expression to be passed in
-as an argument to pattern-match with its value. For example,
-let $\{p_1\to e_1;\cdots; p_n\to e_n\}$ be a pattern-matching lambda.
-Then, the application $\,\{p_1\to e_1;\cdots; p_n\to e_n\}\,e\,$
-corresponds to a pattern matching expression in Haskell
-${\bf\;case}\;e\;{\bf of}\;\{p_1\to e_1;\cdots; p_n\to e_n\}$.
-
 
 \begin{figure} %%%% 14 lines
 \begin{verbatim}
@@ -646,6 +549,16 @@ unfold_N_ap(N,E0$E1,E,Es) :- N>0, M is N-1,
 \label{fig:mit}
 \end{figure}
 
+\subsection{Pattern Matching for Algebraic Datatypes}\label{ssec:patlam}
+In Fig.\ref{fig:patlam} (on p\pageref{fig:patlam}), we specify
+pattern matching expressions without the scrutinee, which is
+also known as pattern-matching lambdas. A pattern lambda is
+a function that awaits an expression to be passed in
+as an argument to pattern-match with its value. For example,
+let $\{p_1\to e_1;\cdots; p_n\to e_n\}$ be a pattern-matching lambda.
+Then, the application $\,\{p_1\to e_1;\cdots; p_n\to e_n\}\,e\,$
+corresponds to a pattern matching expression in Haskell
+${\bf\;case}\;e\;{\bf of}\;\{p_1\to e_1;\cdots; p_n\to e_n\}$.
 
 We represent pattern-matching lambdas in Prolog as a list of clauses
 that match each pattern to a body, for instance,
@@ -747,7 +660,7 @@ The \verb|mu(F)| appearing in the Prolog specification corresponds to
 a recursive type $\mu F$ constructed by the fixpoint type operator $\mu$
 applied to a base structure $F$, which is not recursive by itself.
 Here, we require that $F$ is either a type constructor introduced by
-a (non-recursive) datatype declaration or partial application of
+a (non-recursive) datatype declaration or a partial application of
 such a type constructor. We add a kinding rule for the fixpoint type operator
 by adding another rule of the \verb|kind| predicate for \verb|mu(F)|.
 The Mendler-style iteration over regular datatypes (\verb|mit(X,Alts)|)
@@ -823,7 +736,7 @@ infer_bsum :- % sum of all elelments in Bush of natrual numbers
 
 
 The specification for Mendler-style iteration in Fig.~\ref{fig:mit}
-is only 20 lines, including pattern-matching lambdas $14+18=32$ lines,
+is only 18 lines, including pattern-matching lambdas $14+18=32$ lines,
 including HM with type constructor polymorphism and kind polymorphism
 the total is $32+14+18=64$ lines of Prolog (excluding empty lines).
 The complete specification, and also a reference implementation, of
@@ -858,12 +771,13 @@ In Nax, pattern-matching lambdas can have annotations, which are
 just like the annotations on the Mender-style iteration in \S\ref{ssec:mit},
 to aid type inference.
 
-The kind structure needed for type constructor (i.e. higher-kinded) polymorphism is exactly
+The kind structure needed for type constructor polymorphism is exactly
 the kinds supported in the higher-order polymorphic lambda calculus,
-known as System \Fw\ \cite{girard72thesis}. Type constructors in \Fw\ can have
-types as arguments. For example, the type constructor \textit{List}
+known as System \Fw\ \cite{girard72thesis}.
+Type constructors in \Fw\ can have types as arguments.
+For example, the type constructor \textit{List}
 for lists has kind $* \to *$, which means that it needs one type argument
-to be fully applied as a type (e.g. $\textit{List}~\texttt{Nat} : *$).
+to be fully applied as a type (e.g. $\textit{List}\,~\texttt{Nat} : *$).
 \begin{align*}
   &\text{kind in System \Fw}  &&\kappa ::= * \mid \kappa \to \kappa \\
   &\text{kind in System \Fi}  &&\kappa ::= * \mid \kappa \to \kappa
@@ -872,13 +786,13 @@ to be fully applied as a type (e.g. $\textit{List}~\texttt{Nat} : *$).
 To support terms, as well as types, to be applied to type constructors
 as arguments, the kind structure needs to be extended.
 System~\Fi\ \cite{AhnSheFioPit13}, which Nax is based on, extends
-the kind structure
-with $\{A\,\}\to \kappa$ to support term indices in types.
-This extension to kinds allows type constructors with term indices
+the kind structure with $\{A\,\}\to \kappa$ to support term indices in types.
+This extension allows type constructors 
 such as $\textit{Vec} : * \to \{\textit{Nat}\,\} \to *$ for vectors
 (a.k.a. length indexed lists). For instance,
 $\textit{Vec}~\textit{Bool}~\{8\}$ is a type of boolean vectors of length 8.
-There are two ramifications of term indices being involved in type inference:
+There are two ramifications regarding type inference:
+% being involved in type inference:
 \begin{itemize}\vspace*{-.75ex}
 \item the unification is modulo equivalence of terms: For instance,
   the type system should consider $\textit{Vec}~\textit{Bool}~\{n\}$ and
@@ -891,9 +805,9 @@ There are two ramifications of term indices being involved in type inference:
   ($A$ in $\{\!A\}\to\kappa$), therefore, kinding rules
   need to invoke typing rules.
 \end{itemize}
-Extending our specification with term indices, while continuing to serve
-as a reference implementation, would be an interesting future work that
-might involve resolving possible challenges from these two ramifications.
+Extending our relational specification with term indices would be
+an interesting future work that might involve resolving possible challenges
+from these two ramifications.
 
 %%%%%% \section{Related Work}\label{sec:relwork} %%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{relwork}
@@ -907,50 +821,50 @@ are surprisingly few such specifications (see \S\ref{ssec:otherLP}); found only
 few for HM, but unable to find relational specifications for more sophisticated
 polymorphisms such as higher kinded polymorphism and kind polymorphism.
 Our work is a pioneering case study on this subject matter, demonstrating
-the possibility of relational specification for advanced features,
+the possibility of relational specification for advanced polymorphic features,
 highlighting the benefits of relational specifications, and identifying
 limitations of the logic programming systems presently available.
 
 There are novel features and designs scattered around in different
 theories/systems that could be useful for relational specifications of
-advanced type systems, as discussed in \S\ref{sec:relwork} (e.g.,
+type systems, as discussed in \S\ref{sec:relwork} (e.g.,
 nominal treatment of fresh names, embedded DSLs for LP, abstractions
 for control flow in LP, alternative resolution semantics). We believe
-a tool that makes it easy to develop relational specifications of
-advanced type systems can open a new era in language construction,
-analogous to the impact when parser generators such as yacc were
-first introduced. But to realize such a tool, we need a combined effort
-of both functional and logic programing communities to seamlessly put
-together such novel features/designs accomplished individually
-in different settings into the context of ``relational specifications
-of polymorphic type systems''.
+that there should be a tool that makes it easy to develop relational
+specifications of advanced type systems. Such a tool can open a new
+era in language construction, analogous to the impact when parser generators,
+such as, yacc were first introduced. But to realize such a tool, we need
+a combined effort of both functional and logic programing communities to
+seamlessly put together such novel features/designs accomplished individually
+in different settings into the context of ``\emph{relational specifications
+of polymorphic type systems}''.
 
-We defined in Prolog a type inference implementation for a non-trivial
-type system by making extensive use of Prolog's native support for
-unification, allowing us to obtain a concise and runnable specification.
-In particular we use logical variables to represent type (or kind) variables
-in type (or kind) schemas.
-
-We overcame the conflicting view of type variables between type- and
-kind-checking by delaying kind-checking constraints until after
-type checking is completed and type variables can be made ground and so
-can be used as indexes into the kinding context. We believe this could
-have been simplified if there was either a language level support or
-well tailored framework for establishing a dual-view on the variables
-in logic programming.
-
-We also showed the flexibility of this technique by successively
-extending the language with more advanced language features like
-recursive let, pattern matching and Mendler-style iteration.
-
-The use of extra-logical built-ins like \verb|copy_term/2| makes so we
-can exploit Prolog's logical variables not only for unification but
-also to represent binding of quantified type (or kind) variables,
-greatly simplifying the handling of implicit polymorphism.
-
-Logical variables can however also limit the predictability of how the
-program is going to behave, since a predicate running on inputs that
-are not grounded enough can get stuck.
+% We defined in Prolog a type inference implementation for a non-trivial
+% type system by making extensive use of Prolog's native support for
+% unification, allowing us to obtain a concise and runnable specification.
+% In particular we use logical variables to represent type (or kind) variables
+% in type (or kind) schemas.
+% 
+% We overcame the conflicting view of type variables between type- and
+% kind-checking by delaying kind-checking constraints until after
+% type checking is completed and type variables can be made ground and so
+% can be used as indexes into the kinding context. We believe this could
+% have been simplified if there was either a language level support or
+% well tailored framework for establishing a dual-view on the variables
+% in logic programming.
+% 
+% We also showed the flexibility of this technique by successively
+% extending the language with more advanced language features like
+% recursive let, pattern matching and Mendler-style iteration.
+% 
+% The use of extra-logical built-ins like \verb|copy_term/2| makes so we
+% can exploit Prolog's logical variables not only for unification but
+% also to represent binding of quantified type (or kind) variables,
+% greatly simplifying the handling of implicit polymorphism.
+% 
+% Logical variables can however also limit the predictability of how the
+% program is going to behave, since a predicate running on inputs that
+% are not grounded enough can get stuck.
 
 \subsubsection*{Acknowledgements.}
 Thanks to Patricia Johann for insightful discussions that helped us clarifying

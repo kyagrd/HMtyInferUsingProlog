@@ -1,6 +1,6 @@
 \section{Related Work}\label{sec:relwork}
 \subsection{A framwrowk for extending HM}
-The idea of using logic programming to specify type inference is not new.
+The idea of using logic programming (LP) to specify type inference is not new.
 \citet*{HMX99} defined a general framework called \HMX\ for specifying
 extensions of HM (e.g., records, type classes, intersection types)
 and \citet{tyinferCHR02} implemented \HMX\ using Prolog with
@@ -13,7 +13,7 @@ as well as with type polymorphism.
 
 \subsection{Delayed Goals and Control Flow in Logic Programming}
 The concept of delayed goals have been used in many different contexts
-in logic programming. An AILog\footnote{A logical inference system for designing
+in LP. An AILog\footnote{A logical inference system for designing
 	 intelligent agents.} textbook \cite{AILogTextBook},
 introduces delaying goals as one of the useful abilities of meta-interpreter.
 Many Prolog systems, such as SWI or SICStus, provide built-in support for
@@ -26,32 +26,30 @@ Recently, \citet{SchDemDesWei13} implemented delimited continutations for
 Prolog, which might be a usful abstraction for describing the delayed goals
 used in our specification.
 
-\subsection{Other Logic Programming systems}\label{ssec:otherLP}
+\subsection{Other Logic Programming Systems}\label{ssec:otherLP}
 There are experimental Prolog implementations that support peculiar features
 such as \aProlog\ \cite{cheney04iclp} supporting nominal abstraction in a purely
 logical setting and \lProlog\ \cite{nadathur99cade} supporting (restricted
-version of) higher-order unification. Such features may help us specify universal
-quantifications and fresh name generations more elegantly, but there is a
-trade-off for not having the pragmatic support (e.g. built-ins for extra-logical
-features, documentation, and graphical debugging) of more widely-used and
-well-maintained systems such as SWI or SICStus. In fact, the developer of
-\aProlog\ attempted to implement of HM type inference for mini-ML in \aProlog,
-but failed to produce a working version.\footnote{See \texttt{miniml.apl}
-	in the examples directory of the \aProlog\ version 0.4 or 0.3.}
+version of) higher-order unification. Such features may be helpful for certain
+parts of type system specifications. However, we hove not found a relational
+specification for polymorphic type system in these implementations. In fact,
+the developer of \aProlog\ attempted to implement of HM type inference for
+mini-ML in \aProlog, but failed to produce a working version.\footnote{
+	See \texttt{miniml.apl} in the examples directory of
+	the \aProlog\ version 0.4 or 0.3.}
 The Teyjus \lProlog\ compiler version 2 distribution includes an example of
-a PCF implementation in \lProlog, whose polymorphic type inference is similar
-to HM but without polymorphic let-bidings. Both the borken mini-ML implementation
-in \aProlog\ and the working PCF implementation \lProlog\ defines their
-type inference predicate tailored for type inference only, unlike our relational
-description that works for multiple purposes (type checking \& inferernce),
-and the unification used in the mini-ML and PCF implementations are user defined,
-rather than relying on the native unification provided by the logic programming
-systems.
+a PCF implementation in \lProlog, which is similar to HM but without
+polymorphic let-bidings. Both the broken mini-ML implementation in \aProlog\ and
+the working PCF implementation \lProlog\ defines their type inference predicate
+tailored for type inference only, unlike our relational description that works
+for multiple purposes of type checking \& inferernce, and the unification used
+in the mini-ML and PCF implementations are user defined rather than relying on
+the native unification provided by the LP systems.
 
 Kanren\footnote{Kanren is a phonetic transcription of the Kanji word
 	\begin{CJK}{UTF8}{min}{関連}\end{CJK} meaning ``\emph{relation}''.}
-is a delcarative logic programming system embedded in a pure functional subset of
-Scheme. A relational implementation of HM is provided in
+is a delcarative LP system embedded in a pure functional subset of Scheme.
+A relational implementation of HM is provided in
 the Kanren repository,\footnote{See \url{http://kanren.sourceforge.net/\#Sample}}
 which works for both type checking and type infernece, and also for
 type inhabitance searching, as in our HM specification in Prolog.
@@ -59,18 +57,18 @@ A simplified version of Kanren called miniKANREN\footnote{
 	\url{http://minikanren.org/} } has been implemented in several dialects
 of Scheme and even further simplified kernel \muKanren\ (microKanren)
 \cite{microKanren} are being implemeted in growing number of host languages as
-embeded Domain Specific Language (eDSL) for logic programming. By design, Kanren
-and its simplified versions do not provide concrete syntax but rely on the syntax
-of their host language. Therefore, Kanren itself is not best suited for
+embeded Domain Specific Language (eDSL) for LP. By design, Kanren and its
+simplified versions do not provide concrete syntax but rely on the syntax of
+their host language. Therefore, Kanren itself is not best suited for
 a speicifcation language, but has its benifits of being flexibile, simple, and
-portable. If one is to build a tool based on logic programming concepts and wants
-to support interfaces to one ore even more programming languages, \muKanren\ may
-be a good choice to targat as the backend.
+portable. If one is to build a tool based on LP concepts and wishes to support
+interfaces to one or more programming languages, \muKanren\ may be a good choice
+to targat as the backend.
 
-Recently, there has been research on type inference using logic programming
-with non-standard semantics (e.g., corecursive, coinductive, or coalgebraic)
-for object-oriented languages (e.g., featherweight Java) but
-functional languages were left for future work \cite{AL-ECOOP09}.
+Recently, there has been research on type inference using LP with non-standard
+semantics (e.g., corecursive, coinductive, or coalgebraic) for object-oriented
+languages (e.g., featherweight Java) but functional languages were left for
+future work \cite{AL-ECOOP09}.
 \citet{SRLP15} have developed S-resolution, which is an alternative resolution
 semantics that has been proven \cite{PCR15} to produces the same results when
 the traditional depth-first-search style SLD-resolutaion used in Prolog
