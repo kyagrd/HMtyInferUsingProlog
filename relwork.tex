@@ -22,11 +22,11 @@ such as \verb|freeze| or \verb|when|. In our specification supporting
 type constructor polymorphism and kind polymorphism, we could not
 simply use \verb|freeze| or \verb|when| because we pre-process
 the collected delayed goals (see \verb|variableze| in \S\ref{ssec:HMtck}).
-Recently, \citet{SchDemDesWei13} implemented delimited continutations for Prolog,
-which might be a usful abstraction for describing the delayed goals used in
-our specification.
+Recently, \citet{SchDemDesWei13} implemented delimited continutations for
+Prolog, which might be a usful abstraction for describing the delayed goals
+used in our specification.
 
-\subsection{Other Logic Programming systems}
+\subsection{Other Logic Programming systems}\label{ssec:otherLP}
 There are experimental Prolog implementations that support peculiar features
 such as \aProlog\ \cite{cheney04iclp} supporting nominal abstraction in a purely
 logical setting and \lProlog\ \cite{nadathur99cade} supporting (restricted
@@ -48,12 +48,6 @@ and the unification used in the mini-ML and PCF implementations are user defined
 rather than relying on the native unification provided by the logic programming
 systems.
 
-Recently, there has been research on type inference using logic programming
-with non-standard semantics (e.g., corecursive, coinductive, or coalgebraic)
-for object-oriented languages (e.g., featherweight Java) but
-functional languages were left for future work \cite{AL-ECOOP09}.
-\TODO{talk about Structural Resolution TODO what to cite?}
-
 Kanren\footnote{Kanren is a phonetic transcription of the Kanji word
 	\begin{CJK}{UTF8}{min}{関連}\end{CJK} meaning ``\emph{relation}''.}
 is a delcarative logic programming system embedded in a pure functional subset of
@@ -72,6 +66,19 @@ a speicifcation language, but has its benifits of being flexibile, simple, and
 portable. If one is to build a tool based on logic programming concepts and wants
 to support interfaces to one ore even more programming languages, \muKanren\ may
 be a good choice to targat as the backend.
+
+Recently, there has been research on type inference using logic programming
+with non-standard semantics (e.g., corecursive, coinductive, or coalgebraic)
+for object-oriented languages (e.g., featherweight Java) but
+functional languages were left for future work \cite{AL-ECOOP09}.
+\citet{SRLP15} have developed S-resolution, which is an alternative resolution
+semantics that has been proven \cite{PCR15} to produces the same results when
+the traditional depth-first-search style SLD-resolutaion used in Prolog
+terminates, but S-resolutaion can answer more queries even when SLD-resolution
+loops because it behaves less eagerly. S-resolution encompasses both inductive
+and coinductive reasonings by supporting sound productivity checking criteria
+for recursivley defined predicates. S-resulution might be helful for
+our speicifcation, if it could eliminate the need of delayed goals.
 
 \subsection{Descriptions of Type Inference Algorithms in ITPs}
 There are several formal descriptions of type inference algorithms using

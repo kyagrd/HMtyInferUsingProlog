@@ -57,7 +57,7 @@
   }
 
 % a short form should be given in case it is too long for the running head
-\titlerunning{A Case Study on Polymorphic Type Inference using Prolog}
+\titlerunning{Executable Relational Specifications of Polymorphic Type Systems}
 
 % the name(s) of the author(s) follow(s) next
 %
@@ -479,10 +479,9 @@ we exploit DCG rules (as many other do) as a neat syntax for
 a \emph{writer monad} that collects \texttt{kind} assertions
 as a side-output within the brackets (e.g., \verb|[kind(KC,A->B,o)]|) and pure
 computations appear in curly braces (e.g., \verb|{ first(X:T,C) }|).\footnote{
-  For the readers who are not familiar with DCG rules and writer monads,
-  we also provide specifications without using DCG, along with the examples
-  in this paper, online at \url{https://github.com/kyagrd/HMtyInferUsingProlog} }
-
+  For those not familiar with DCG rules and writer monads,
+  specifications without using DCG are also available on the online repository
+  (see \S\ref{sec:intro}, p\pageref{githubURL}). }
 The \verb|infer_type| predicate implements the two-staged solution,
 as follows:
 \begin{itemize}
@@ -560,7 +559,7 @@ compared to the previous section, because our main purpose here is to
 demonstrate that supporting these features does not significantly increase
 the size and the complexity of our specification. Readers with further
 interest are encouraged to experiment with our specifications available
-online.
+on the online repository (see \S\ref{sec:intro}, p\pageref{githubURL}).
 
 \subsection{Recursive Let-bindings}\label{ssec:letrec}
 Adding recursive let-bindings is obvious. Simply add
@@ -818,9 +817,9 @@ infer_bsum :- % sum of all elelments in Bush of natrual numbers
 \caption{Example queries of type inference: List length and Bush sum.}
 \label{fig:TIexample}
 \end{figure}
-\TODO{Add explanation using Bush example, how the variables including
-  \texttt{Is} and \texttt{T0} in \texttt{Is-->T0} as discussed in conversation
-  with Patricia.}
+%% \TODO{Add explanation using Bush example, how the variables including
+%%   \texttt{Is} and \texttt{T0} in \texttt{Is-->T0} as discussed in conversation
+%%   with Patricia.}
 
 
 The specification for Mendler-style iteration in Fig.~\ref{fig:mit}
@@ -841,9 +840,9 @@ data constructors should be straightforward.
 
 
 \section{Future Work}\label{sec:futwork}
-We plan to continue our work on several additional features:
-generalized algebraic datatypes (GADTs), real term-indices
-in GADTs (as in Nax), and row polymorphism \cite{Gaster96apolymorphic}.
+We plan to continue our work on several additional features, including
+generalized algebraic datatypes (GADTs) and real term-indices
+in GADTs (as in Nax). %, and row polymorphism \cite{Gaster96apolymorphic}.
 
 GADTs add complexity of introducing local constraints
 within a pattern-matching clause, which should not escape
@@ -902,12 +901,35 @@ might involve resolving possible challenges from these two ramifications.
 
 
 \section{Conclusions}\label{sec:concl}
+During this work, we searched for relational specifications of type systems
+that are executable in logic programming systems, only to find out that there
+are surprisingly few such specifications (see \S\ref{ssec:otherLP}); found only
+few for HM, but unable to find relational specifications for more sophisticated
+polymorphisms such as higher kinded polymorphism and kind polymorphism.
+Our work is a pioneering case study on this subject matter, demonstrating
+the possibility of relational specification for advanced features,
+highlighting the benefits of relational specifications, and identifying
+limitations of the logic programming systems presently available.
+
+There are novel features and designs scattered around in different
+theories/systems that could be useful for relational specifications of
+advanced type systems, as discussed in \S\ref{sec:relwork} (e.g.,
+nominal treatment of fresh names, embedded DSLs for LP, abstractions
+for control flow in LP, alternative resolution semantics). We believe
+a tool that makes it easy to develop relational specifications of
+advanced type systems can open a new era in language construction,
+analogous to the impact when parser generators such as yacc were
+first introduced. But to realize such a tool, we need a combined effort
+of both functional and logic programing communities to seamlessly put
+together such novel features/designs accomplished individually
+in different settings into the context of ``relational specifications
+of polymorphic type systems''.
 
 We defined in Prolog a type inference implementation for a non-trivial
 type system by making extensive use of Prolog's native support for
-unification, allowing us to obtain a concise and runnable
-specification. In particular we use logical variables to
-represent type (or kind) variables in type (or kind) schemas.
+unification, allowing us to obtain a concise and runnable specification.
+In particular we use logical variables to represent type (or kind) variables
+in type (or kind) schemas.
 
 We overcame the conflicting view of type variables between type- and
 kind-checking by delaying kind-checking constraints until after
