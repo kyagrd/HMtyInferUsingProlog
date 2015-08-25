@@ -191,7 +191,7 @@ cleverly implements the idea of polymorphic instantiation in HM.
 The built-in predicate {\small\verb|copy_term|} makes a copy of
 the first argument and unifies it with the second argument. The copied version
 is identical to the original term except all the Prolog variables have been
-substituted with freshly generated variables. The instantiation a polymorphic
+substituted with freshly generated variables. The instantiation of a polymorphic
 type {\small\verb|poly(C,T)|} is implemented as
 {\small\verb|copy_term(t(C,T),t(C,T1))|}.
 Firstly, a copied version of {\small\verb|t(C,T)|} is made.
@@ -250,9 +250,9 @@ and a rose tree when $c$ instantiates to a list constructor.
 The type system of Haskell infers that $c$ has kind $*\to*$ and
 $a$ has kind $*$. That is, this generic tree datatypes is polymorphic on
 the unary type constructor variable $c$ as well as on the type variable $a$.
-Haskell type system is also able to infer types for polymorphic functions defined
-over \textit{Tree}s, which may involve polymorphism over type constructors
-as well as over types.
+Haskell's type system is also able to infer types for polymorphic functions
+defined over \textit{Tree}s, which may involve polymorphism over
+type constructors as well as over types.
 
 The Prolog specification in Fig.~\ref{fig:HMtck} describes
 type constructor polymorphism and kind polymorphism, in only 32 lines
@@ -296,10 +296,13 @@ in order to invoke checks for well-kindedness using the kinding rules
 
 First step is to have the typing rules take an additional argument for
 kinding context (\verb|KC|) along with the typing context (\verb|C|).
-Because the kinding rules require a kinding context. The typing rules
+%% Because the kinding rules require a kinding context.
+The typing rules
 should keep track of the kinding context in order to invoke \verb|kind|
-from \verb|type|. Thus, we add another argument to \verb|type| for
-the kinding context (i.e., from \verb|type(C,...)| to \verb|type(KC,C,...)|).
+from \verb|type|.  That is, we change the definition of the \verb|type|
+predicate from \verb|type(C,...)| to \verb|type(KC,C,...)|.
+%% Thus, we add another argument to \verb|type| for
+%% the kinding context
 
 \begin{figure} % 32 lines
 \begin{verbatim}
@@ -353,7 +356,7 @@ appendKC([kind(KC,X,K)|Gs],KC1,[kind(KC2,X,K)|Gs1]) :-
 The second step is to invoke well-kindedness checks from the necessary
 places among the typing rules. We follow the formulation of Pure Type
 Systems \cite{Barendregt91}, a generic theory of typed lambda calculi,
-which indicates that well-kindednss checks are required at the
+which indicates that well-kindedness checks are required at the
 formation of function types, that is, in the typing rule for lambda
 expressions. One would naturally attempt the following modification:%
 {\small\vspace*{-1ex}
@@ -374,9 +377,9 @@ There are mainly two reasons for the erratic behavior.
 Firstly, there is not enough information at the moment of
 well-kindedness checking. At the invocation of \verb|kind|,
 the only available information is that it is a function type \verb|A -> B|.
-Whether \verb|A| or \verb|B| is a variable, a type constructor application,
-or a function type may be determined later on, when there are other parts
-of expression to be type checked or type inferred. Secondly, we have
+Whether \verb|A| and \verb|B| are variables, type constructor applications,
+or function types may be determined later on, when there are other parts
+of the expression to be type checked (or inferred). Secondly, we have
 a conflicting view on type variables at the typing level and
 at the kinding level. At the typing level, we think of type variables as
 unification variables, implemented by Prolog variables in order to exploit
@@ -396,10 +399,10 @@ This programming technique is known as \emph{delayed goals}
 in logic programming, which is like building up a to-do list or continuation.
 We use the Definite Clause Grammar (DCG) rules % \cite{SWIPrologManual}
 to collect delayed goals using a neat syntax. The DCG rules were originally
-esigned for describing production rules of formal grammar, where nonterminals
+designed for describing production rules of formal grammar, where nonterminals
 are specified within the brackets and context-sensitive conditions are
-pecified within curly braces using ordinary Prolog predicates. Here,
-we exploit DCG rules (as many other do) as a neat syntax for
+specified within curly braces using ordinary Prolog predicates. Here,
+we exploit DCG rules (as many others do) as a neat syntax for
 a \emph{writer monad} that collects \texttt{kind} assertions
 as a side-output within the brackets (e.g., \verb|[kind(KC,A->B,o)]|) and pure
 computations appear in curly braces (e.g., \verb|{ first(X:T,C) }|).
@@ -423,7 +426,7 @@ of the identity function and generates one delayed goal
 {\;\small\verb|kind([], (_G1643->_G1643), o)|}.
 \item[2.]
 %% From the 2nd line,
-%% we invoke this delayed goal after preprocessing of concertizing
+%% we invoke this delayed goal after preprocessing of concretizing
 %% the type variables.
 In the 2nd line, we make a copied version of
 the delayed goals using {\small\verb|copy_term|} in order to decouple
@@ -432,7 +435,7 @@ After the 2nd line, {\small\verb|Gs|} contains a copied version of
 {\small\verb|Gs0|} with freshly renamed variables, say
 {\small\verb|Gs = [kind([], (_G2211->_G2211), o)]|}.
 \item[3,4.]
-The 3rd and 4th line collects all the type variables
+The 3rd and 4th lines collects all the type variables
 in {\small\verb|Gs|} into {\small\verb|Xs|}, that is,
 {\small\verb|Xs=[_G2211]|}, continuing with the identity function example.
 \item[5.]
@@ -441,7 +444,7 @@ the Prolog variables collected in {\small\verb|Xs|} into concrete
 type variables with fresh names. In {\small\verb|variablize|},
 {\small\verb|gensym(t,X)|} generates atoms with fresh names that start with
 {\small\verb|t|}. For instance, {\small\verb|X=t1|}, {\small\verb|X=t2|},
-$\cdots$. After 5th line, where it is concretized as
+$\cdots$. After the 5th line, where it is concretized as
 {\small\verb|_G2211=var(t1)|}, we have {\small\verb|Xs = [var(t1)]|} and
 {\small\verb|Gs = [kind([], (var(t1)->var(t1)), o)]|}.
 \item[6,7.] Freshly generated type variables need to be
@@ -697,7 +700,7 @@ infer_len :- % length of List
 %%%% var(N)$_G1653
 %%%% true .
 
-infer_bsum :- % sum of all elelments in Bush of natrual numbers
+infer_bsum :- % sum of all elements in Bush of natural numbers
   TM_e5 = mit(bsum, [I]-->((I->mu(var('N')))->mu(var('N'))),
             [ 'BN'       -> lam(f,Zero)
             , 'BC'(x,xs) -> lam(f,
@@ -736,7 +739,7 @@ non-regular datatypes (\verb|mit(X,Is-->T0,Alts)|) needs an annotation
 polymorphic recursion. The specification for Mendler-style iteration relies
 on pattern-matching lambdas discussed in the previous subsection. Once we have
 properly set up the kinding context and typing context for the name of
-recursive call (\verb|X|), the rest amounts to inferring types for
+the recursive call (\verb|X|), the rest amounts to inferring types for
 pattern-matching lambdas. Pointers to further details on Mendler-style
 recursion \cite{vene00phd,AbeMatUus03,AhnShe11} and Nax \cite{Ahn14thesis}
 are available in the references section at the end of this paper.
@@ -767,7 +770,7 @@ We plan to continue our work on several additional features, including
 generalized algebraic datatypes (GADTs) and real term-indices
 in GADTs (as in Nax). %, and row polymorphism \cite{Gaster96apolymorphic}.
 
-GADTs add complexity of introducing local constraints
+GADTs add the complexity of introducing local constraints
 within a pattern-matching clause, which should not escape
 the scope of the clause, unlike global unification constraints in HM.
 It would be interesting to see whether Prolog's built-in support for
@@ -880,7 +883,7 @@ of polymorphic type systems}''.
 Thanks to Patricia Johann for helping us clarify the specification
 for Mendler-style iteration, Ekaterina Komendantskaya and
 Frantisek Farka for the discussions on S-Resolution,
-Peng Fu for pointers to Kanren, and Chris Warburton for proofreading.
+Peng Fu for pointers to Kanren, and Chris Warburton for careful proofreading.
 \makeatletter
 \renewcommand\bibsection{\section*\bibname}
 \makeatother
