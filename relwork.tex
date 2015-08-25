@@ -3,8 +3,8 @@
 The idea of using logic programming (LP) to specify type inference is not new.
 \citet*{HMX99} defined a general framework called \HMX\ for specifying
 extensions of HM (e.g., records, type classes, intersection types)
-and \citet{tyinferCHR02} implemented \HMX\ using Prolog with
-constraint handling rules (CHR). Testing a type system extension
+and \citet{tyinferCHR02} implemented \HMX\ using Prolog.
+. Testing a type system extension
 in the \HMX\ framework provides a certain level of confidence that the extension
 would work well with type polymorphism in HM. Testing an extension by
 extending our specification provides additional confidence that the extension
@@ -12,88 +12,86 @@ would work well with type constructor polymorphism and kind polymorphism,
 as well as with type polymorphism.
 
 \subsection{Delayed Goals and Control Flow in Logic Programming}
-The concept of delayed goals have been used in many different contexts
-in LP. An AILog\footnote{A logical inference system for designing
-	 intelligent agents.} textbook \cite{AILogTextBook},
+Delayed goals have been used in many different contexts in LP. An AILog
+% \footnote{A logical inference system for designing intelligent agents.}
+	 textbook \cite{AILogTextBook},
 introduces delaying goals as one of the useful abilities of meta-interpreter.
-Many Prolog systems, such as SWI or SICStus, provide built-in support for
+Several Prolog systems including SWI and SICStus provide built-in support for
 delaying a goal until certain conditions are met using the predicates
-such as \verb|freeze| or \verb|when|. In our specification supporting
-type constructor polymorphism and kind polymorphism, we could not
-simply use \verb|freeze| or \verb|when| because we pre-process
-the collected delayed goals (see \verb|variableze| in \S\ref{ssec:HMtck}).
+such as {\small\verb|freeze|} or {\small\verb|when|}. In our specification,
+%% supporting type constructor polymorphism and kind polymorphism,
+we could not simply use {\small\verb|freeze|} or {\small\verb|when|}
+because we pre-process the collected delayed goals (see \verb|variableze|
+in \S\ref{ssec:HMtck}).
 Recently, \citet{SchDemDesWei13} implemented delimited continutations for
-Prolog, which might be a useful abstraction for describing the delayed goals
-used in our specification.
+Prolog, which might be a useful abstraction for the delayed goals 
+in our work.
 
 \subsection{Other Logic Programming Systems}\label{ssec:otherLP}
-There are experimental Prolog implementations that support peculiar features
-such as \aProlog\ \cite{cheney04iclp} supporting nominal abstraction in a purely
-logical setting and \lProlog\ \cite{nadathur99cade} supporting (restricted
-version of) higher-order unification. Such features may be helpful for certain
-parts of type system specifications. However, we hove not found a relational
-specification for polymorphic type system in these implementations. In fact,
-the developer of \aProlog\ attempted to implement of HM type inference for
+Some experimental Prolog implementations support interesting features such as
+nominal abstraction in \aProlog\ \cite{cheney04iclp} and a (restricted version
+of) higher-order unification in \lProlog\ \cite{nadathur99cade}. However, we
+have not found a relational specification of polymorphic type systems using
+them. The \aProlog\ developer attempted to implement of HM type inference for
 mini-ML in \aProlog, but failed to produce a working version.\footnote{
 	See \texttt{miniml.apl} in the examples directory of
 	the \aProlog\ version 0.4 or 0.3.}
-The Teyjus \lProlog\ compiler version 2 distribution includes an example of
-a PCF implementation in \lProlog, which is similar to HM but without
-polymorphic let-bidings. Both the broken mini-ML implementation in \aProlog\ and
-the working PCF implementation \lProlog\ defines their type inference predicate
-tailored for type inference only, unlike our relational description that works
-for multiple purposes of type checking \& inferernce, and the unification used
-in the mini-ML and PCF implementations are user defined rather than relying on
-the native unification provided by the LP systems.
+The Teyjus \lProlog\ compiler version 2 includes a PCF example,
+which is similar to HM but without polymorphic let-bidings.
+In both example implementations, they define the type inference predicate
+tailored for type inference only (unlike our relational specification that
+works for both type checking and inferernce) and the unification used in
+their type inference are manually crafted rather than relying on
+the native unification of the LP systems.
 
-Kanren\footnote{Kanren is a phonetic transcription of the Kanji word
+Kanren\footnote{ Kanren is a phonetic transcription of the Kanji word
 	\begin{CJK}{UTF8}{min}{関連}\end{CJK} meaning ``\emph{relation}''.}
 is a delcarative LP system embedded in a pure functional subset of Scheme.
 A relational implementation of HM is provided in
-the Kanren repository,\footnote{See \url{http://kanren.sourceforge.net/\#Sample}}
-which works for both type checking and type infernece, and also for
+the Kanren repository,
+% \footnote{See \url{http://kanren.sourceforge.net/\#Sample}}
+which works for both type checking,type infernece, and also for
 type inhabitance searching, as in our HM specification in Prolog.
-A simplified version of Kanren called miniKanren\footnote{
-	\url{http://minikanren.org/} } has been implemented in several dialects
-of Scheme and even further simplified kernel \muKanren\ (microKanren)
-\cite{microKanren} are being implemeted in growing number of host languages as
-embeded Domain Specific Language (eDSL) for LP. By design, Kanren and its
-simplified versions do not provide concrete syntax but rely on the syntax of
-their host language. Therefore, Kanren itself is not best suited for
-a speicifcation language, but has its benifits of being flexibile, simple, and
-portable. If one is to build a tool based on LP concepts and wishes to support
-interfaces to one or more programming languages, \muKanren\ may be a good choice
-to targat as the backend.
+A simplified version called miniKanren
+% \footnote{ \url{http://minikanren.org/} }
+has been implemented in several dialects of Scheme and even further simplified
+kernel \muKanren\ \cite{microKanren} are being implemeted in growing number of
+host languages as an embeded Domain Specific Language (eDSL) for LP.
+By design, Kanren does not provide concrete syntax, therefore, not best suited
+for a speicifcation language. However, Kanren has its benifits of being
+flexibile, simple, and portable. If one is to build a tool based on LP concepts
+and wishes to support interfaces to one or more programming languages,
+\muKanren\ may be a good choice to targat as the backend.
 
 Recently, there has been research on type inference using LP with non-standard
 semantics (e.g., corecursive, coinductive, or coalgebraic) for object-oriented
 languages (e.g., featherweight Java) but functional languages were left for
 future work \cite{AL-ECOOP09}.
-\citet{SRLP15} have developed S-resolution, which is an alternative resolution
-semantics that has been proven \cite{PCR15} to produces the same results when
-the traditional depth-first-search style SLD-resolutaion used in Prolog
-terminates, but S-resolutaion can answer more queries even when SLD-resolution
-loops because it behaves less eagerly. S-resolution encompasses both inductive
-and coinductive reasonings by supporting sound productivity checking criteria
-for recursivley defined predicates. S-resulution might be helful for
-our speicifcation, if it could eliminate the need of delayed goals.
+\citet{SRLP15} have developed S-resolution, which is proven \cite{PCR15} to
+produces the same results when the depth-first-search style SLD-resolutaion
+used in Prolog terminates, but S-resolutaion can answer more
+queries that makes SLD-resolution loop, because it behaves less eagerly.
+%% S-resolution encompasses both inductive
+%% and coinductive reasonings by supporting sound productivity checking criteria
+%% for recursivley defined predicates.
+S-resulution might be useful for us to eliminate the need of delayed goals
+in our speicifcation.
 
 \subsection{Descriptions of Type Inference Algorithms in ITPs}
 There are several formal descriptions of type inference algorithms using
 Interactive Theorem Provers (ITPs) such as Coq \cite{Dubois00} and
-Isabelle/HOL \cite{NaraschewskiN-JAR,UrbanN2009}. The primoary motivation
+Isabelle/HOL \cite{UrbanN2009}. The primoary motivation %% NaraschewskiN-JAR,
 in such work is to formally prove theoretical properties (e.g., soundness,
 principal typing) of type inference algorithms, which is differeent from
 our motivation of providing a human readable \& machine executable
 specificiation for the algorithm to reduce the gap between
 theoretical specification and practical implementation. Some of those
 descriptions  are not even executable because the unification is merely
-specified as set of logical axioms, only for the sake of proving properties.
-Formally describing certifiable type inference algorhthms ITPs are challenging
+specified as set of logical axioms.
+Formally describing certifiable type inference in ITPs are challenging
 (therefore also challenging to extend or modify) for two reasons. First, fresh
-name geneartion should be monitored more explicitly and rigourously in order to
-provide proper information for the sake of formal proof. Second, some parts of
-the algorithm may need to be massaged into certain froms, differrent from their
-usual represnetations, in order to convince the termination checker of the ITP
-(e.g. \cite{JFP:185139}).
+names should be monitored more explicitly and rigourously for the sake of
+formal proof. Second, algorithms may need to be massaged differeently from
+their usual represnetations, in order to convince the termination checker of
+the ITP (e.g. \cite{JFP:185139}).
 

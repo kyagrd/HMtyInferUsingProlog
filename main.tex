@@ -26,10 +26,10 @@
 \usepackage{hyperref}
 \usepackage[hang,labelfont=bf]{caption}
 \usepackage[normalem]{ulem}
-\usepackage{xcolor}
-\makeatletter
-\def\squiggly{\bgroup \markoverwith{\textcolor{red}{\lower3.5\p@\hbox{\sixly \char58}}}\ULon}
-\makeatother
+%% \usepackage{xcolor}
+%% \makeatletter
+%% \def\squiggly{\bgroup \markoverwith{\textcolor{red}{\lower3.5\p@\hbox{\sixly \char58}}}\ULon}
+%% \makeatother
 \usepackage[square,numbers]{natbib}
 
 
@@ -139,12 +139,13 @@ before running the Prolog specifications. {\small\vspace*{-1ex}
 \begin{verbatim}
   :- set_prolog_flag(occurs_check,true).
   :- op(500,yfx,$).
-\end{verbatim} {\small\vspace*{-.7ex} }\noindent
+\end{verbatim} \vspace*{-.7ex} }\noindent
 The first line sets Prolog's unification operator \verb|=| to perform
 occurs check, which is needed for the correct behavior of type inference.
 The second line declares \verb|$| as a left associative infix operator,
 which is used to represent application operator in the object language syntax.
-For instance, \verb|E1$E2| is an application of \verb|E1| to \verb|E2|.
+For instance, {\small\verb|E1$E2|} is an application of
+{\small\verb|E1|} to {\small\verb|E2|}.
 
 \begin{figure}[t]
 \begin{verbatim}
@@ -168,45 +169,48 @@ For instance, \verb|E1$E2| is an application of \verb|E1| to \verb|E2|.
 HM supports rank-1 polymorphic types (a.k.a. type schemes), which are
 introduced by polymorphic let-bindings.
 In the specification of HM (Fig.~\ref{fig:HM}), a monomorphic type is
-represented as \verb|mono(A)| and a polymorphic type is represented as
-\verb|poly(C,A)|. A typing context in HM may contain two kinds of bindings:
-monomorphic bindings (\verb|X:mono(A)|) and
-polymorphic bindings (\verb|X:poly(C,A)|).
+represented as {\small\verb|mono(A)|} and a polymorphic type is represented as
+{\small\verb|poly(C,A)|}. A typing context in HM may contain two kinds of
+bindings: monomorphic bindings ({\small\verb|X:mono(A)|}) and
+polymorphic bindings ({\small\verb|X:poly(C,A)|}).
 %% The Prolog specification of HM is only 8 lines (excluding empty lines).
 
-The four rules defining the \verb|type| predicate are almost literal
+The four rules defining the {\small\verb|type|} predicate are almost literal
 transcriptions of the typing rules of HM. The first rule for finding
-a type (\verb|T1|) of a variable expression (\verb|var(X)|) amounts
-to instantiating (\verb|instantiate(T,T1)|) the type (\verb|T|)
-in the binding (\verb|X:T|) that first matches the variable
-bound in the typing context (\verb|C|).
+a type ({\small\verb|T1|}) of a variable expression ({\small\verb|var(X)|})
+amounts to instantiating ({\small\verb|instantiate(T,T1)|}) the type
+({\small\verb|T|}) in the binding ({\small\verb|X:T|}) that first matches
+the variable bound in the typing context ({\small\verb|C|}).
 The two rules for lambda and application expressions are self explanatory.
 The last rule for let expressions introduce polymorphic bindings.
-Note that a polymorphic biding \verb|poly(C,A)| refers to
-the typing context \verb|C| of the let expression.
+% Note that a polymorphic biding \verb|poly(C,A)| refers to
+% the typing context \verb|C| of the let expression.
 
-The \verb|instantiate| predicate
+The {\small\verb|instantiate|} predicate
 cleverly implements the idea of polymorphic instantiation in HM.
-The built-in predicate \verb|copy_term| makes a copy of the first argument
-and unifies it with the second argument. The copied version is identical to
-the original term except all the Prolog variables have been substituted with
-freshly generated variables. The instantiation a polymorphic type
-\verb|poly(C,T)| is implemented as \verb|copy_term(t(C,T),t(C,T1))|.
-Firstly, a copied version of \verb|t(C,T)| is made. Say \verb|t(C2,T2)|
-is the copied version with all variables in both \verb|C| and \verb|T|
-are freshly renamed in \verb|C2| and \verb|T2|. Secondly, \verb|t(C2,T2)|
-is unified with \verb|t(C,T1)|, which amounts to \verb|C2=C| and
-\verb|T2=T1|. Because \verb|C2| is being unified with the original
-context \verb|C|, all freshly generated variables in \verb|C2| are
-unified with the original variables in \verb|C|. Therefore, only
-the variables in \verb|T| that do not occur in its binding context
-\verb|C| shall effectively be freshly instantiated in \verb|T1|.
-This exactly captures generalization and instantiation of
+The built-in predicate {\small\verb|copy_term|} makes a copy of
+the first argument and unifies it with the second argument. The copied version
+is identical to the original term except all the Prolog variables have been
+substituted with freshly generated variables. The instantiation a polymorphic
+type {\small\verb|poly(C,T)|} is implemented as
+{\small\verb|copy_term(t(C,T),t(C,T1))|}.
+Firstly, a copied version of {\small\verb|t(C,T)|} is made.
+Say {\small\verb|t(C2,T2)|} is the copied version with all variables
+in both {\small\verb|C|} and {\small\verb|T|}
+are freshly renamed in {\small\verb|C2|} and {\small\verb|T2|}.
+Secondly, {\small\verb|t(C2,T2)|}
+is unified with {\small\verb|t(C,T1)|}, which amounts to {\small\verb|C2=C|}
+and {\small\verb|T2=T1|}. Because {\small\verb|C2|} is being unified with
+the original context {\small\verb|C|}, all freshly generated variables in
+{\small\verb|C2|} are unified with the original variables in \verb|C|.
+Therefore, only the variables in {\small\verb|T|} that do not occur in its
+binding context {\small\verb|C|} shall effectively be freshly instantiated in 
+{\small\verb|T1|}. This exactly captures generalization and instantiation of
 polymorphic types in HM.
 
-One great merit of this specification is that it also serves as
-a machine executable reference implementation. We can run the specification
-for type checking, as follows: {\small \vspace*{-1ex}
+One great merit of this relational specification is that it also serves as
+a machine executable reference implementation. We can run it
+for type checking: {\small \vspace*{-1ex}
 \begin{verbatim}
   ?- type([], lam(x,var(x)), A -> A).         
   true .
@@ -390,7 +394,7 @@ for the rest of the work at the kinding level. Instead of directly invoking
 well-kindedness assertions into a list to be handled later.
 This programming technique is known as \emph{delayed goals}
 in logic programming, which is like building up a to-do list or continuation.
-We use the Definite Clause Grammar (DCG) rules \cite{SWIPrologManual}
+We use the Definite Clause Grammar (DCG) rules % \cite{SWIPrologManual}
 to collect delayed goals using a neat syntax. The DCG rules were originally
 esigned for describing production rules of formal grammar, where nonterminals
 are specified within the brackets and context-sensitive conditions are
@@ -398,15 +402,16 @@ pecified within curly braces using ordinary Prolog predicates. Here,
 we exploit DCG rules (as many other do) as a neat syntax for
 a \emph{writer monad} that collects \texttt{kind} assertions
 as a side-output within the brackets (e.g., \verb|[kind(KC,A->B,o)]|) and pure
-computations appear in curly braces (e.g., \verb|{ first(X:T,C) }|).\footnote{
-  For those not familiar with DCG rules and writer monads,
-  specifications without using DCG are also available on the online repository
-  (see \S\ref{sec:intro}, p\pageref{githubURL}). }
+computations appear in curly braces (e.g., \verb|{ first(X:T,C) }|).
+%% \footnote{
+%%   For those not familiar with DCG rules and writer monads,
+%%   specifications without using DCG are also available on the online repository
+%%   (see \S\ref{sec:intro}, p\pageref{githubURL}). }
 The \verb|infer_type| predicate implements the two-staged solution,
 as follows:\vspace{-1ex}
 \begin{itemize}
 \item[1.]
-The 1st line of the definition is the first stage at the typing level.
+The 1st line is the first stage at the typing level.
 For example, {\small \vspace*{-1ex}
 \begin{verbatim}
   ?- phrase( type([],[],lam(x,var(x)),T), Gs0 ).
@@ -416,9 +421,11 @@ For example, {\small \vspace*{-1ex}
 it infers the most generic type ({\small\verb|_G1643->_G1643|})
 of the identity function and generates one delayed goal
 {\;\small\verb|kind([], (_G1643->_G1643), o)|}.
-\item[2.] From the 2nd line,
-we invoke this delayed goal after preprocessing of concertizing
-the type variables. In the 2nd line, we make a copied version of
+\item[2.]
+%% From the 2nd line,
+%% we invoke this delayed goal after preprocessing of concertizing
+%% the type variables.
+In the 2nd line, we make a copied version of
 the delayed goals using {\small\verb|copy_term|} in order to decouple
 the variables of the first stage from the variables of the second stage.
 After the 2nd line, {\small\verb|Gs|} contains a copied version of
@@ -427,36 +434,36 @@ After the 2nd line, {\small\verb|Gs|} contains a copied version of
 \item[3,4.]
 The 3rd and 4th line collects all the type variables
 in {\small\verb|Gs|} into {\small\verb|Xs|}, that is,
-{\small\verb|Xs=[_G2211]|}.
+{\small\verb|Xs=[_G2211]|}, continuing with the identity function example.
 \item[5.]
 The 5th line {\small\verb|maplist(variablize,Xs)|} instantiates
 the Prolog variables collected in {\small\verb|Xs|} into concrete
-type variables with fresh names. In {\small\verb|variablize|}, invoking
+type variables with fresh names. In {\small\verb|variablize|},
 {\small\verb|gensym(t,X)|} generates atoms with fresh names that start with
 {\small\verb|t|}. For instance, {\small\verb|X=t1|}, {\small\verb|X=t2|},
-and so on. After 5th line, where it is concretized as
+$\cdots$. After 5th line, where it is concretized as
 {\small\verb|_G2211=var(t1)|}, we have {\small\verb|Xs = [var(t1)]|} and
 {\small\verb|Gs = [kind([], (var(t1)->var(t1)), o)]|}.
-\item[6,7.] Freshly generated concrete type variables need to be
-registered to the kinding context because the first kinding rule requires
-that type variables must be bound in the typing context. The 6th line creates
-monomorphic type bindings for all the variable names in {\small\verb|Xs|},
-and collects them into {\small\verb|KC1|}. Continuing with the identity example,
+\item[6,7.] Freshly generated type variables need to be
+registered to the kinding context they must be bound
+in the typing context. The 6th line monomorphically binds 
+all the variable names in {\small\verb|Xs|} and collects them
+into {\small\verb|KC1|}. Continuing with the identity function example,
 {\small\verb|KC1=[t1:mono(K1)]|} after the 6th line. The 7th line
-extends each kinding context in the dealyed goal {\small\verb|Gs|} with
-the bindings ({\small\verb|KC1|}) for the freshly generated variables, 
-where the goals with extended contexts are collected in {\small\verb|Gs1|}.
-After 7th line, we have 
+extends each kinding context in {\small\verb|Gs|} with {\small\verb|KC1|}
+for the freshly generated variables. The goals with extended contexts are
+collected in {\small\verb|Gs1|}. After 7th line, we have 
 {\small\verb|Gs1 = [kind([t1:mono(K1)], (var(t1)->var(t1)), o)]|}.
-\item[8.] Finally, the delayed well-kindedness assertions in \verb|Gs1|
+\item[8.] Finally, the delayed well-kindedness assertions in {\small\verb|Gs1|}
   are called on as goals, which amounts to the following query
-  for our identity function example:{\small
+  for our identity function example:{\small \vspace*{-1ex}
 \begin{verbatim}
   ?- kind([t1:mono(K1)], (var(t1)->var(t1)), o).
   K1 = o
-\end{verbatim} \vspace*{-.7ex} }
-It succeeds by inferring that the fresh
-type variable \verb|var(t1)| must have kind \verb|o|. \vspace*{-1.5ex}
+\end{verbatim} \vspace*{-.7ex} }%
+% It succeeds by inferring that the fresh variable 
+% \verb|var(t1)| must have kind \verb|o|.
+\vspace*{-2ex}
 \end{itemize}
 
 \section{Supporting Other Language Features}\label{sec:other}
@@ -491,6 +498,44 @@ the let-bound value, as follows:
 We could also allow polymorphic recursion by type annotations
 on the let-bound variable, like we will do for Mendler-style iteration
 over non-regular datatypes in \S\ref{ssec:mit}.
+
+
+\subsection{Pattern Matching for Algebraic Datatypes}\label{ssec:patlam}
+In Fig.\ref{fig:patlam} (on p\pageref{fig:patlam}), we specify
+pattern matching expressions without the scrutinee, which is
+also known as pattern-matching lambdas. A pattern lambda is
+a function that awaits an expression to be passed in
+as an argument to pattern-match with its value. For example,
+let $\{p_1\to e_1;\cdots; p_n\to e_n\}$ be a pattern-matching lambda.
+Then, the application $\,\{p_1\to e_1;\cdots; p_n\to e_n\}\,e\,$
+corresponds to a pattern matching expression in Haskell
+${\bf\;case}\;e\;{\bf of}\;\{p_1\to e_1;\cdots; p_n\to e_n\}$.
+
+We represent pattern-matching lambdas in Prolog as a list of clauses
+that match each pattern to a body, for instance,
+\verb|['Nil'-->E1, 'Cons'(x,xs)-->E2]|
+where \verb|E1| and \verb|E2| are expressions of the bodies. For simplicity,
+we implement the most simple design of non-nested patterns. That is,
+a pattern is either an atom that represents a nullary data constructor,
+such as \verb|'Nil'|, or a complex term with $n$-ary function symbol
+that represents $n$-ary data constructor and $n$ variables as arguments,
+such as \verb|'Cons'(x,xs)|.
+%% Atoms and function symbols normally start with lowercase letters in Prolog.
+%% However, Prolog allows other names to become atoms and function symbols
+%% when those names are single-quoted.
+Here, we are using the convention
+such that names of type constructors and data constructors start with 
+uppercase letters while names of term variables (including pattern variables)
+start with lowercase letters. We also add a delayed well-kindedness goal
+because patten lambdas introduce function types (\verb|A-> T|), just like
+ordinary lambda expressions.
+
+%% kThe specification above for non-nested pattern-matching lambdas
+%% kis only 14 lines. To sum up, the specification for HM extended
+%% kwith type constructor polymorphism, kind polymorphism, and
+%% knon-nested pattern matching for algebraic datatypes is in $32+14=46$
+%% klines of Prolog, which is also an executable reference implementation
+%% kof the type system.
 
 \begin{figure} %%%% 14 lines
 \begin{verbatim}
@@ -549,41 +594,6 @@ unfold_N_ap(N,E0$E1,E,Es) :- N>0, M is N-1,
 \label{fig:mit}
 \end{figure}
 
-\subsection{Pattern Matching for Algebraic Datatypes}\label{ssec:patlam}
-In Fig.\ref{fig:patlam} (on p\pageref{fig:patlam}), we specify
-pattern matching expressions without the scrutinee, which is
-also known as pattern-matching lambdas. A pattern lambda is
-a function that awaits an expression to be passed in
-as an argument to pattern-match with its value. For example,
-let $\{p_1\to e_1;\cdots; p_n\to e_n\}$ be a pattern-matching lambda.
-Then, the application $\,\{p_1\to e_1;\cdots; p_n\to e_n\}\,e\,$
-corresponds to a pattern matching expression in Haskell
-${\bf\;case}\;e\;{\bf of}\;\{p_1\to e_1;\cdots; p_n\to e_n\}$.
-
-We represent pattern-matching lambdas in Prolog as a list of clauses
-that match each pattern to a body, for instance,
-\verb|['Nil'-->E1, 'Cons'(x,xs)-->E2]|
-where \verb|E1| and \verb|E2| are expressions of the bodies. For simplicity,
-we implement the most simple design of non-nested patterns. That is,
-a pattern is either an atom that represents a nullary data constructor,
-such as \verb|'Nil'|, or a complex term with $n$-ary function symbol
-that represents $n$-ary data constructor and $n$ variables as arguments,
-such as \verb|'Cons'(x,xs)|.
-Atoms and function symbols normally start with lowercase letters in Prolog.
-However, Prolog allows other names to become atoms and function symbols
-when those names are single-quoted. Here, we are using the convention
-such that names of type constructors and data constructors start with 
-uppercase letters while names of term variables (including pattern variables)
-start with lowercase letters. We also add a delayed well-kindedness goal
-because patten lambdas introduce function types (\verb|A-> T|), just like
-ordinary lambda expressions.
-
-The specification above for non-nested pattern-matching lambdas
-is only 14 lines. To sum up, the specification for HM extended
-with type constructor polymorphism, kind polymorphism, and
-non-nested pattern matching for algebraic datatypes is in $32+14=46$
-lines of Prolog, which is also an executable reference implementation
-of the type system.
 
 \subsection{Recursion Schemes for Non-Regular Algebraic Datatypes}
 \label{ssec:mit}
@@ -603,26 +613,23 @@ elements of \emph{the same type as the prior element}.
 or has an element tailed by a \textit{Bush} that contains (zero or more) 
 elements \emph{but their type $(\textit{Bush}~a)$ is different from 
 the type of the prior element $(a)$}.
-The recursive component (\textit{List a} in $C_{\!L}~a~(\textit{List}~a)$),
-which is the tail of a list, has exactly the same type argument ($a$) as
-the datatype being defined
-(\textit{List a} in $\textbf{data}~\textit{List}~a = \ldots$).
+%% The recursive component (\textit{List a} in $C_{\!L}~a~(\textit{List}~a)$),
+%% which is the tail of a list, has exactly the same type argument ($a$) as
+%% the datatype being defined
+%% (\textit{List a} in $\textbf{data}~\textit{List}~a = \ldots$).
 
 Every recursive component of \textit{List}, which is the tail of a list,
 has exactly the same type argument ($a$) as the \textit{List} containing
-the tail. In other words, the types of recursive occurrences in \textit{List}
-is always the same, or \emph{regular}. When all recursive occurrences in
-a (recursive) datatype are regular, as in \emph{List}, it is called
+the tail. Because the types of recursive occurrences in \textit{List} are
+always the same, or \emph{regular}, therefore categorized as
 a \emph{regular datatype}. The recursive component of \textit{Bush},
 on the contrary, has different type argument (\textit{Bush a}) from
-the type argument ($a$) of its containing \textit{Bush}. That is,
-a bush headed by an element of type $a$ is tailed by a bush whose
-head element is of type \emph{Bush a}. A recursive datatype that
-has a non-regular recursive occurrence, as in \emph{Bush}, is called
-a \emph{non-regular datatype}, also known as
-a \emph{nested datatype}\;\cite{BirMee98} because the types of
-recursive components typically become nested as the recursion goes deeper
-(e.g., $\textit{Bush}(\textit{Bush}(\cdots(Bush(\textit{Bush}~a))\cdots))$).
+the type argument ($a$) of its containing \textit{Bush}. Due to this
+non-regularity of the types in its recursive occurrences, \emph{Bush} is
+categorized as a \emph{non-regular datatype}, which is also known as
+a \emph{nested datatype}\;\cite{BirMee98} because the types of recursive
+components typically become nested as the recursion goes deeper.
+% (e.g., $\textit{Bush}(\textit{Bush}(\cdots(Bush(\textit{Bush}~a))\cdots))$).
 
 In order to define interesting and useful recursive functions over
 non-regular datatypes, one needs polymorphic recursion, whose 
@@ -656,26 +663,6 @@ uncontrolled general recursion.
 %% \label{fig:mitrule}
 %% \end{figure}
 
-The \verb|mu(F)| appearing in the Prolog specification corresponds to
-a recursive type $\mu F$ constructed by the fixpoint type operator $\mu$
-applied to a base structure $F$, which is not recursive by itself.
-Here, we require that $F$ is either a type constructor introduced by
-a (non-recursive) datatype declaration or a partial application of
-such a type constructor. We add a kinding rule for the fixpoint type operator
-by adding another rule of the \verb|kind| predicate for \verb|mu(F)|.
-The Mendler-style iteration over regular datatypes (\verb|mit(X,Alts)|)
-does not need any type annotation. The Mendler-style iteration over
-non-regular datatypes (\verb|mit(X,Is-->T0,Alts)|) needs an annotation
-(\verb|Is-->T0|) to guide the type inference because it is likely to rely on
-polymorphic recursion. The specification for Mendler-style iteration relies
-on pattern-matching lambdas discussed in the previous subsection. Once we have
-properly set up the kinding context and typing context for the name of
-recursive call (\verb|X|), the rest amounts to inferring types for
-pattern-matching lambdas. Pointers to further details on Mendler-style
-recursion \cite{vene00phd,AbeMatUus03,AhnShe11} and Nax \cite{Ahn14thesis}
-are available in the references section at the end of this paper.
-Here, in Fig.~\ref{fig:TIexample}, we provide type inference queries on
-some example programs using Mendler-style iteration.
 
 \begin{figure}\small
 \begin{verbatim}
@@ -734,13 +721,36 @@ infer_bsum :- % sum of all elelments in Bush of natrual numbers
 %%   \texttt{Is} and \texttt{T0} in \texttt{Is-->T0} as discussed in conversation
 %%   with Patricia.}
 
+The \verb|mu(F)| appearing in the Prolog specification corresponds to
+a recursive type $\mu F$ constructed by the fixpoint type operator $\mu$
+applied to a base structure $F$, which is not recursive by itself.
+%% Here, we require that $F$ is either a type constructor introduced by
+%% a (non-recursive) datatype declaration or a partial application of
+%% such a type constructor.
+We add a kinding rule for the fixpoint type operator
+by adding another rule of the \verb|kind| predicate for \verb|mu(F)|.
+The Mendler-style iteration over regular datatypes (\verb|mit(X,Alts)|)
+does not need any type annotation. The Mendler-style iteration over
+non-regular datatypes (\verb|mit(X,Is-->T0,Alts)|) needs an annotation
+(\verb|Is-->T0|) to guide the type inference because it is likely to rely on
+polymorphic recursion. The specification for Mendler-style iteration relies
+on pattern-matching lambdas discussed in the previous subsection. Once we have
+properly set up the kinding context and typing context for the name of
+recursive call (\verb|X|), the rest amounts to inferring types for
+pattern-matching lambdas. Pointers to further details on Mendler-style
+recursion \cite{vene00phd,AbeMatUus03,AhnShe11} and Nax \cite{Ahn14thesis}
+are available in the references section at the end of this paper.
+Here, in Fig.~\ref{fig:TIexample}, we provide type inference queries on
+some example programs using Mendler-style iteration.
 
-The specification for Mendler-style iteration in Fig.~\ref{fig:mit}
-is only 18 lines, including pattern-matching lambdas $14+18=32$ lines,
-including HM with type constructor polymorphism and kind polymorphism
-the total is $32+14+18=64$ lines of Prolog (excluding empty lines).
-The complete specification, and also a reference implementation, of
-all the features discussed so far fits in only 64 lines of Prolog.
+
+
+%% The specification for Mendler-style iteration in Fig.~\ref{fig:mit}
+%% is only 18 lines, including pattern-matching lambdas $14+18=32$ lines,
+%% including HM with type constructor polymorphism and kind polymorphism
+%% the total is $32+14+18=64$ lines of Prolog (excluding empty lines).
+% The complete specification, and also a reference implementation, of
+% all the features discussed so far fits in only 64 lines of Prolog.
 
 A missing part from a typical functional language type system, which
 we have not discussed in this paper, is the initial phase of populating
@@ -762,18 +772,19 @@ within a pattern-matching clause, which should not escape
 the scope of the clause, unlike global unification constraints in HM.
 It would be interesting to see whether Prolog's built-in support for
 handling unification variables and symbols could help us express
-the concept of local constraints as elegantly as we expressed
-polymorphic instantiation in \S\ref{sec:poly}. In addition,
-more user supplied annotations will be required to guide the type inference,
+%% the concept of local constraints.
+%% as elegantly as we expressed
+%% polymorphic instantiation in \S\ref{sec:poly}.
+In addition, more user supplied annotations will be needed,
 even when recursion is not involved, because GADT type inference is
-undecidable \cite{DegtyarevV95} regardless of the use of recursion.
-In Nax, pattern-matching lambdas can have annotations, which are
-just like the annotations on the Mender-style iteration in \S\ref{ssec:mit},
-to aid type inference.
+undecidable \cite{DegtyarevV95} regardless of recursion.
+In Nax, pattern-matching lambdas can have annotations,
+just like the annotations on the Mender-style iteration in \S\ref{ssec:mit}.
+%% to aid type inference.
 
 The kind structure needed for type constructor polymorphism is exactly
 the kinds supported in the higher-order polymorphic lambda calculus,
-known as System \Fw\ \cite{girard72thesis}.
+known as System \Fw\ %% \cite{girard72thesis}.
 Type constructors in \Fw\ can have types as arguments.
 For example, the type constructor \textit{List}
 for lists has kind $* \to *$, which means that it needs one type argument
@@ -805,7 +816,7 @@ There are two ramifications regarding type inference:
   ($A$ in $\{\!A\}\to\kappa$), therefore, kinding rules
   need to invoke typing rules.
 \end{itemize}
-Extending our relational specification with term indices would be
+Extending our specification with term indices would be
 an interesting future work that might involve resolving possible challenges
 from these two ramifications.
 
@@ -817,25 +828,24 @@ from these two ramifications.
 \section{Conclusions}\label{sec:concl}
 During this work, we searched for relational specifications of type systems
 that are executable in logic programming systems, only to find out that there
-are surprisingly few such specifications (see \S\ref{ssec:otherLP}); found only
-few for HM, but unable to find relational specifications for more sophisticated
-polymorphisms such as higher kinded polymorphism and kind polymorphism.
-Our work is a pioneering case study on this subject matter, demonstrating
-the possibility of relational specification for advanced polymorphic features,
-highlighting the benefits of relational specifications, and identifying
-limitations of the logic programming systems presently available.
+are surprisingly few (\S\ref{ssec:otherLP}); found few for HM but were not
+able to find specifications for more sophisticated polymorphisms.
+Our work is a pioneering case study on this subject matter,
+demonstrating the possibility of relational specification for advanced
+polymorphic features, highlighting the benefits of relational specifications,
+and identifying limitations of the LP systems presently available.
 
 There are novel features and designs scattered around in different
 theories/systems that could be useful for relational specifications of
 type systems, as discussed in \S\ref{sec:relwork} (e.g.,
-nominal treatment of fresh names, embedded DSLs for LP, abstractions
+nominal logic in LP, embedded DSLs for LP, abstractions
 for control flow in LP, alternative resolution semantics). We believe
 that there should be a tool that makes it easy to develop relational
-specifications of advanced type systems. Such a tool can open a new
-era in language construction, analogous to the impact when parser generators,
-such as, yacc were first introduced. But to realize such a tool, we need
+specifications of type systems. Such a tool can open a new era
+in language construction, analogous to the impact when parser generators
+such as yacc were first introduced. But to realize such a tool, we need
 a combined effort of both functional and logic programing communities to
-seamlessly put together such novel features/designs accomplished individually
+seamlessly put together such novel ideas accomplished individually
 in different settings into the context of ``\emph{relational specifications
 of polymorphic type systems}''.
 
@@ -867,10 +877,10 @@ of polymorphic type systems}''.
 % are not grounded enough can get stuck.
 
 \subsubsection*{Acknowledgements.}
-Thanks to Patricia Johann for insightful discussions that helped us clarifying
-the specification for Mendler-style iteration, Ekaterina Komendantskaya and
-Frantisek Fraka for the discussions on S-Resolution and its implementation,
-and Peng Fu for pointers to Kanren.
+Thanks to Patricia Johann for helping us clarify the specification
+for Mendler-style iteration, Ekaterina Komendantskaya and
+Frantisek Farka for the discussions on S-Resolution,
+Peng Fu for pointers to Kanren, and Chris Warburton for proofreading.
 \makeatletter
 \renewcommand\bibsection{\section*\bibname}
 \makeatother
