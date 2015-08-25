@@ -129,13 +129,14 @@ main(T) :- ctx0(KCtx,Ctx),
   TM_e3 = ['N'->Zero,'C'(x,xs)->X] $ (C$Zero$Nil),
   TM_lendumb0 = mit(len,['N'->Zero]),
   TM_lendumb = mit(len,['N'->Zero,'C'(x,xs)->Zero]),
-  TM_len = mit(len,['N'->Zero,'C'(x,xs)->Succ$(var(len)$var(xs))]),
+  TM_len = mit(len,['N'->Zero,
+                    'C'(x,xs)->Succ$(var(len)$var(xs))]),
   TM_e4 = let(length=TM_len, Cons$ (var(length)$(Cons$Zero$Nil))
                                  $ (Cons$ (var(length)$(Cons$Nil$Nil)) $ Nil) ),
   TM_e5 = mit(bsum, [I]-->((I->mu(N))->mu(N)),
              [ 'BN'       -> lam(f,Zero)
              , 'BC'(x,xs) -> lam(f,
-                   var(plus) $ (var(f)$X)
+                   var(plus) $ (var(f)$var(x))
                              $ (var(bsum) $ var(xs)
                                           $ lam(ys,var(bsum)$var(ys)$var(f)) )
                                 )
@@ -145,4 +146,54 @@ main(T) :- ctx0(KCtx,Ctx),
 % tested on SWI-Prolog version 7.2.0
 
 %%%% TODO test some poly kinded type consturctors
+
+%% to include in paper as an example
+
+getKC0([ 'N':mono(o->o)            % Nat    = mu(var('N'))
+       , 'L':mono(o->o->o)         % List A = mu(var('L')$A)
+       , 'B':mono((o->o)->(o->o))  % Bush A = mu(var('B'))$A
+       ]).
+
+getC0(% Ctors of N
+      [ 'Z':poly([] , N$R1)
+      , 'S':poly([] , R1 -> N$R1)
+      % Ctors of L
+      , 'N':poly([] , L$A2$R2)
+      , 'C':poly([] , A2->(R2->(L$A2$R2)))
+      % Ctors of B
+      , 'BN':poly([] , B$R3$A3)
+      , 'BC':poly([] , A3 -> R3$(R3$A3) -> B$R3$A3)
+      % used in bsum example
+      , 'plus':poly([], mu(N) -> mu(N) -> mu(N))
+      ])
+  :- N = var('N'), L = var('L'), B = var('B').
+
+infer_len :- % length of List
+  TM_len = mit(len,['N'      ->Zero,
+                    'C'(x,xs)->Succ$(var(len)$var(xs))]),
+  Zero = in(0,var('Z')),
+  Succ = lam(x,in(0,var('S')$var(x))),
+  getKC0(KCtx), getC0(Ctx),
+  infer_type(KCtx,Ctx,TM_e5,T), writeln(T).
+
+%%%% ?- infer_len.
+%%%% var(N)$_G1653
+%%%% true .
+
+infer_bsum :- % sum of all elelments in Bush containing natural numbers
+  TM_e5 = mit(bsum, [I]-->((I->mu(var('N')))->mu(var('N'))),
+              [ 'BN'       -> lam(f,Zero)
+              , 'BC'(x,xs) -> lam(f,
+                    var(plus) $ (var(f)$var(x))
+                              $ (var(bsum) $ var(xs)
+                                           $ lam(ys,var(bsum)$var(ys)$var(f))))
+              ]),
+  Zero = in(0,var('Z')),
+  getKC0(KCtx), getC0(Ctx),
+  infer_type(KCtx,Ctx,TM_e5,T), writeln(T).
+
+%%%% ?- infer_bsum.
+%%%% mu(var(B))$_G1452-> (_G1452->mu(var(N)))->mu(var(N))
+%%%% true .
+
 

@@ -4,5 +4,5 @@ main.pdf: main.bbl main.blg
 main.bbl main.blg : main.aux main.bib
 	bibtex main
 
-main.aux: main.tex
+main.aux: main.tex intro.tex relwork.tex
 	pdflatex main
