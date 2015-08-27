@@ -19,8 +19,11 @@ type(KC,C,let(X=E0,E1),T) :- type(KC,C,              E0,A),
 instantiate(poly(C,T),T1) :- copy_term(t(C,T),t(C,T1)).
 instantiate(mono(T),  T).
 
-first(K:V,[K1:V1|Xs]) :- K=K1 -> V=V1 ; first(K:V,Xs).
+first(K:V,[K1:V1|Xs]) :- K = K1, V=V1.
+first(K:V,[K1:V1|Xs]) :- K\==K1, first(K:V, Xs).
 
 variablize(var(X)) :- gensym(t,X).
 
 
+monoKC([]).
+monoKC([_:mono(_)|KC]) :- monoKC(KC).
