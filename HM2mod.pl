@@ -11,8 +11,7 @@ kind(KC,A -> B,o)  :- kind(KC,A,o), kind(KC,B,o).
 type(KC,C,var(X),     T1) :- first(X:T,C), instantiate(T,T1).
 type(KC,C,lam(X,E), A->B) :- type(KC,[X:mono(A)|C],E,B),
                              kind(KC,A->B,o).
-type(KC,C,X $ Y,       B) :- type(KC,C,X,A->B),
-                             type(KC,C,Y,A,  ).
+type(KC,C,X $ Y,       B) :- type(KC,C,X,A->B), type(KC,C,Y,A).
 type(KC,C,let(X=E0,E1),T) :- type(KC,C,              E0,A),
                              type(KC,[X:poly(C,A)|C],E1,T).
 

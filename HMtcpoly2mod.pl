@@ -46,7 +46,7 @@ ctx0([ 'Nat':mono(o)
      ])
   :- Nat = var('Nat'), List = var('List').
 
-main(T) :- ctx0(KC,C),
+main(T) :- ctx0(KC,C), append(KC,KC0,KC1),
   X = var(x), Y = var(y), Z = var(z),
   Zero = var('Zero'), Succ = var('Succ'),
   Cons = var('Cons'), Nil = var('Nil'),
@@ -55,7 +55,7 @@ main(T) :- ctx0(KC,C),
   TM_bad = lam(x,X$X),
   TM_e1 = let(id=TM_id,var(id)$var(id)),
   TM_e2 = lam(y,let(x=lam(z,Y),X$X)),
-  type(KC,C,TM_e2,T).
+  type(KC,C1,TM_e2,T), monoKC(KC0).
 
 monoKC([]).
 monoKC([_:mono(_)|KC]) :- monoKC(KC).
