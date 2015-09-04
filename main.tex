@@ -448,8 +448,8 @@ $\cdots$. After the 5th line, where it is concretized as
 {\small\verb|_G2211=var(t1)|}, we have {\small\verb|Xs = [var(t1)]|} and
 {\small\verb|Gs = [kind([], (var(t1)->var(t1)), o)]|}.
 \item[6,7.] Freshly generated type variables need to be
-registered to the kinding context they must be bound
-in the typing context. The 6th line monomorphically binds 
+registered to the kinding context in order to be well-kinded.
+The 6th line monomorphically binds 
 all the variable names in {\small\verb|Xs|} and collects them
 into {\small\verb|KC1|}. Continuing with the identity function example,
 {\small\verb|KC1=[t1:mono(K1)]|} after the 6th line. The 7th line
