@@ -174,14 +174,14 @@ infer_len :- % length of List
   Zero = in(0,var('Z')),
   Succ = lam(x,in(0,var('S')$var(x))),
   getKC0(KCtx), getC0(Ctx),
-  infer_type(KCtx,Ctx,TM_e5,T), writeln(T).
+  infer_type(KCtx,Ctx,TM_len,T), writeln(T).
 
 %%%% ?- infer_len.
 %%%% var(N)$_G1653
 %%%% true .
 
 infer_bsum :- % sum of all elelments in Bush containing natural numbers
-  TM_e5 = mit(bsum, [I]-->((I->mu(var('N')))->mu(var('N'))),
+  TM_bsum = mit(bsum, [I]-->((I->mu(var('N')))->mu(var('N'))),
               [ 'BN'       -> lam(f,Zero)
               , 'BC'(x,xs) -> lam(f,
                     var(plus) $ (var(f)$var(x))
@@ -190,7 +190,7 @@ infer_bsum :- % sum of all elelments in Bush containing natural numbers
               ]),
   Zero = in(0,var('Z')),
   getKC0(KCtx), getC0(Ctx),
-  infer_type(KCtx,Ctx,TM_e5,T), writeln(T).
+  infer_type(KCtx,Ctx,TM_bsum,T), writeln(T).
 
 %%%% ?- infer_bsum.
 %%%% mu(var(B))$_G1452-> (_G1452->mu(var(N)))->mu(var(N))
