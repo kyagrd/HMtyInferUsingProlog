@@ -102,20 +102,12 @@ Typos, Style
 - General: Please abbreviate references to page numbers as "p. XX" instead of
   "pX".
 
-- Abstract: "implementations ... supports" -> "implementations support"
-
-- Introduction: "... to the language*'s* type system.
-
 - Introduction: The comparison of 90+ *pages* and 400+ *lines* dramatically
   relies on the number of lines per page, which limits the expressiveness
   of the statement. You may either clarify that the numbers originate from
   the cited paper or provide a separate estimation (for instance, the file
   `type.c` of the latest Hugs release contains 3356 lines, and relies on
   auxiliary modules).
-
-- Introduction: "We contemplate ** more challenging language features"
-
-- Section 2: You may want to capitalize this heading as well
 
 - Section 2: Please (re-)introduce the abbreviation "HM" at the beginning,
   possibly accompanied by a citation.
