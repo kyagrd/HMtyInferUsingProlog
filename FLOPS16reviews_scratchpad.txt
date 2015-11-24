@@ -95,13 +95,6 @@ Typos, Style
 - Please consider adding line numbers to your submissions, as it facilitates
   the exchange of typos and alike for both you and me!
 
-- General: I suggest to set the word `let` in teletype when it refers to the
-  language construct such as in `let`-binding, to distinguish it from the
-  English verb.
-
-- General: Please abbreviate references to page numbers as "p. XX" instead of
-  "pX".
-
 - Introduction: The comparison of 90+ *pages* and 400+ *lines* dramatically
   relies on the number of lines per page, which limits the expressiveness
   of the statement. You may either clarify that the numbers originate from
@@ -112,116 +105,22 @@ Typos, Style
 - Section 2: Please (re-)introduce the abbreviation "HM" at the beginning,
   possibly accompanied by a citation.
 
-- Section 2: "to perform *the/an* occurs check"
-
-- Section 2: "left associative" -> "left-associative"
-
-- Section 2: "represent *the* application operator"
-
-- Section 2.1: Please clarify that only *non-recursive* let-bindings
-  are considered.
-
 - Section 2.1: "the *first* binding (X:T) that matches ..."
-
-- Section 2.1: "self explanatory" -> "self-explanatory"
-
-- Section 2.1: "let expressions introduce" -> "let-expressions introduces" (2 changes)
-
-- Section 2.1: "... except *that* all Prolog variables ..."
-
-- Section 2.1: "also for type inference" -> "as well as for type inference"
-
-- Section 2.1: " the specifications ... serve" (not "serves")
-
-- Section 2.1: "type checking and *type* inference"
-
-- Section 2.2: "flavours" -> "flavors" (like in the abstract)
-
-- Section 2.2: "hanging on the leaf*s*"
-
-- Section 2.2: this generic tree datatype" (no trailing "s")
-
-- Section 2.2: "without let binding" -> "without let- bindings" (2 changes)
-
-- Section 2.2: "additional argument for *the* kinding context"
-
-- Section 2.2: "c.f. HM specifications" -> "where the HM specification"
 
 - Figure 2.2: The predicate `free_variables` has not been explained
 
-- Figure 2.2: "binidngs" -> "bindings"
-
-- Section 2.2: Please provide a reference to DCGs.
-
-- Section 2.2: No comma before "as follows"
-
 - Section 2.2, enumeration: Please write "first", second", etc. instead of
   "1st", "2nd", etc.
-
-- Section 2.2, enumeration, point 1: "For example, ... infers" (no "it")
-  and "one delayed goal, *namely* kind(...)"
-
-- Section 3.1, heading: "Recursive Let-*B*indings"
-
-- Section 3.1: "*We simply* add a monomorphic ..."
-
-- Section 3.2: "Fig.3" -> "Fig. 3"
-
-- Section 3.2: "to pattern match its value" (no "with")
-
-- Section 3.2: "expression in Haskell *of the form* case ..."
-
-- Section 3.2: "or a complex term with *an* n-ary ..."
-
-- Section 3.2: "*an* n-ary data constructor"
-
-- Section 3.2: "convention such that" -> "convention that"
-
-- Section 3.2: change "A-> T" either to "A -> T" or "A->T"
 
 - Figure 3: `lower_atom` is not used?
 
 - Figure 4: `in(N,E)` was not explained
 
-- Section 3.3: "therefore categorized" -> "and List is therefore categorized"
-
-- Section 3.3: "has different type argument" -> has a type a argument different"
-
-- Section 3.3: Fig. 4 is located on page 9, not on page 4!
-
 - Section 3.3: "a recursion scheme [no comma] which naturally generalize*s* ..."
-
-- Section 4: no comma after "local constraints"
 
 - Section 4: Missing dot after system F_\omega.
 
-- Section 4: "to be *supplied* to type constructors"
-
-- Section 4: "invokes each other" -> "invoke each other"
-
-- Section 4: "ha*s* to invoke"
-
-- Section 4: "*and* therefore kinding rules ..."
-
-- Section 5.1: Double dot after "Prolog"
-
-- Section 5.2: No comma after "[19]"
-
 - Section 5.3: Please provide an explanation for the abbreviation "PCF"
-
-- Section 5.3: "delcarative" -> "declarative"
-
-- Section 5.3: Please provide a reference to Kanren
-
-- Section 5.3: "*it is* not best suited"
-
-- Section 5.3: "S-resolution can answer more queries that makes SLD-resolution
-  loop" -> "S-resolution can also answer some queries for which SLD-resolution
-  fails to terminate"
-
-- Section 5.4: "*and* therefore also challenging"
-
-- Section 6: "found few" -> "we found a few"
 
 
 ----------------------- REVIEW 2 ---------------------
@@ -261,7 +160,6 @@ some extent.
 
 OTHER COMMENTS:
 
-P1: "Glasgow Haskell Compiler supports" -> "support"
 P2: "capturing both type checking and type inference without duplication" This seems
 compelling at first, but for more complicated systems, where efficient inference can
 be significantly more complex as checking, does it not mean that we have to expect a
@@ -271,7 +169,6 @@ P2: I found the final item in the list of contributions difficult to read/parse.
 P3: Not that it matters much, but why make $ left associative in deviation from Haskell?
 P3: In the first paragraph of 2.1, it's unclear at this point what the role of C is,
 exactly.
-P3: "introduce polymorphic bindings" -> "introduces"
 P3: instantiate and copy_term are rather subtle, and might be easier to understand
 with a concrete example.
 P3: It would be so much nicer if the Prolog rules had types, even if only as comments.
@@ -279,16 +176,11 @@ P4: I'd rather see a definition of "type constructor polymorphism" than just an
 example.
 P4: While you see the need to explain type constructor polymorphism, you simply
 talk about kind polymorphism as if it doesn't need explanation. This seems inconsistent.
-P5: "notated with" -> "denoted by". Also, I'm not sure if using * for the type of types
-is really something that's done "usually". It seems very Haskell-specific.
-P5: "some modification" -> "some modifications"
+P5: Also, I'm not sure if using * for the type of types is really something
+that's done "usually". It seems very Haskell-specific.
 P5: "First step is to" -> "The first step"
 P6: Why repeat the code that does not change? [If you do, might be nice to highlight the
 changes.]
-P8: "patten" -> "pattern"
-P10: "In Fig. 4 (on p4)" -> "on p9"
-P10: "naturally generalize" -> "naturally generalizes"
-P12: "using Prolog. ." -> remove extra period
 
 
 ----------------------- REVIEW 3 ---------------------
@@ -324,6 +216,8 @@ using a neat syntax. -> I actually agree, but this is a technical paper, so I'd 
 - With fully functioning basic building
 blocks for kind inference (kind) and type inference (type), should be .... -> It would be nice if you could have a stronger argument here.
 
-- Last, there is a clear application of your system as a pedagogical tool, but is that it? Also, it would be nice to have a broad perspective on the state of typing in Haskell and ML, and how far you thin you are?
+- Last, there is a clear application of your system as a pedagogical tool, but is that it?
+Also, it would be nice to have a broad perspective on the state of typing in Haskell and ML,
+and how far you thin you are?
 
 - Weird question: what about modules?
