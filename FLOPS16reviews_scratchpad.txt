@@ -46,13 +46,9 @@ The main complication that arises is that there is need to delay some of
 the goals, and create a staged algorithm. For example, during type checking,
 constraints on kinds are collected, which need to be solved separately in
 a later stage.
-
 Not being a Prolog expert myself, I can't help but feel that the approach to
 solving this feels somewhat fragile and hacky, destroying the simplicity
 the approach otherwise sets out to convey.
-
-The paper is well written and reasonably accessible, and the topic is
-a good fit for FLOPS. The problems and solutions are explained well.
 
 It is conceivable (but also somewhat unsurprising) that with a bit of practice,
 Prolog is a viable specification language for such type systems. What seems a
@@ -70,18 +66,6 @@ This seems compelling at first, but for more complicated systems, where
 efficient inference can be significantly more complex as checking, does
 it not mean that we have to expect a more complex specification than
 necessary for pure type checking?
-
-P3: instantiate and copy_term are rather subtle, and might be easier to understand with a concrete example.
-
-P3: It would be so much nicer if the Prolog rules had types, even if only as comments.
-
-P4: I'd rather see a definition of "type constructor polymorphism" than just an
-example.
-
-P4: While you see the need to explain type constructor polymorphism,
-you simply talk about kind polymorphism as if it doesn't need explanation.
-This seems inconsistent.
-
 
 ----------------------- REVIEW 3 ---------------------
 

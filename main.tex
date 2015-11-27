@@ -53,7 +53,7 @@
 
 % first the title is needed
 \title{Executable Relational Specifications of Polymorphic Type Systems
-  using Prolog \\ {\small(to appear in FLOPS 2016)}
+  using Prolog% \\ {\small(to appear in FLOPS 2016)}
   }
 
 % a short form should be given in case it is too long for the running head
@@ -215,9 +215,13 @@ and {\small\verb|T2=T1|}. Because {\small\verb|C2|} is being unified with
 the original context {\small\verb|C|}, all freshly generated variables in
 {\small\verb|C2|} are unified with the original variables in \verb|C|.
 Therefore, only the variables in {\small\verb|T|} that do not occur in its
-binding context {\small\verb|C|} shall effectively be freshly instantiated in 
-{\small\verb|T1|}. This exactly captures generalization and instantiation of
-polymorphic types in HM.
+binding context {\small\verb|C|} will effectively be freshly instantiated in 
+{\small\verb|T1|}. For example, the result of 
+{\small\verb|copy_term(t([X:T],Y->X),t([X:T],T1))|} is
+{\small\verb|T1 = Y1->X|}, where only {\small\verb|Y|} is instantiated to
+a fresh varaible {\small\verb|Y1|} but {\small\verb|X|} stays the same
+because it appears in the typing context {\small\verb|[X:T]|}. This exactly
+captures generalization and instantiation of polymorphic types in HM.
 
 One great merit of this relational specification is that it also serves as
 a machine executable reference implementation. We can run it
@@ -263,7 +267,8 @@ $a$ has kind $*$. That is, this generic tree datatype is polymorphic on
 the unary type constructor variable $c$ as well as on the type variable $a$.
 Haskell's type system is also able to infer types for polymorphic functions
 defined over \textit{Tree}s, which may involve polymorphism over
-type constructors as well as over types.
+type constructors as well as over types. Furthermore, recent versions of the
+Glasgow Haskell Compiler support kind polymorphism \cite{GPH2012}.
 
 The Prolog specification in Fig.~\ref{fig:HMtck} describes
 type constructor polymorphism and kind polymorphism, in only 32 lines
@@ -890,6 +895,18 @@ of polymorphic type systems}''.
 % Logical variables can however also limit the predictability of how the
 % program is going to behave, since a predicate running on inputs that
 % are not grounded enough can get stuck.
+
+% TODO
+% TODO We have deomstrated our approach is useful as a pedagogical tool for
+% TODO specifying the essense of advanced polymorphic features of found in
+% TODO modern functional languages. TODO We hope to push forward to develop
+% TODO our approach into a practical tool. TODO many languages didn't have
+% TODO static
+% TODO types now wants to support static types (at least optionally)
+% TODO Typed Lua, Typed Clojure, Mypy, TypeScript
+% TODO Mention typer project
+% TODO 
+%
 
 \subsubsection*{Acknowledgements.}
 Thanks to Patricia Johann for helping us clarify the specification
