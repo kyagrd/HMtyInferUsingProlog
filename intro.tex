@@ -13,8 +13,9 @@ is extremely helpful, especially for prototyping or testing
 experimental extensions to the language's type system.  
 Jones' attempt of \emph{Typing Haskell in Haskell} \cite{JonesTHiH99} is
 an exemplary work that demonstrates the value of such a concise, declarative,
-and machine executable specification: 90+ pages of Hugs type checker
-implementation in C specified in only 400+ lines of readable Haskell.
+and machine executable specification: the authors report that 90+ pages of
+Hugs type checker implementation in C could be specified in only 400+ lines of
+readable Haskell script.
 
 % In our work, we use Prolog to specify advanced polymorphic features of
 % modern functional languages.
@@ -28,32 +29,35 @@ in Prolog than in functional languages. More importantly, the specifications
 are \emph{relational}, capturing both type checking and type inference
 without duplication.
 
-Our contributions are:
+Our contributions are demonstrating
 \begin{itemize}\vspace*{-1ex}
-\item A relational specification that can be executed for
-	both purposes of type checking and type inference (\S\ref{ssec:HM}).
+\item A relational specification for a polymorphic type system that can be
+	executed for both purposes of type checking and type inference
+	(\S\ref{ssec:HM}).
 \item A succinct and declarative specification for several dimensions of
 	polymorphism (type, type constructor, kind) in less than 35 lines
 	of Prolog (\S\ref{ssec:HMtck}).
-\item An easily extensible specification for pragmatic use
-	(as demonstrated in \S\ref{sec:other}).
+\item A specification that is easily extend from the prior specifications
+	with several pragmatic features such as pattern matching,
+	recursion schemes, and polymorphic recursion (with the help of
+	a few type annotation) (\S\ref{sec:other}).
 % We believe our specification is usable without expert knowledge
 % in logic programming because we only used built-ins and fairly basic
 % library predicates, not relying on any specialized frameworks.
-\item Two-staged inference for types and kinds using delayed goals
+\item A two-staged inference scheme for types and kinds using delayed goals
 	(\S\ref{ssec:HMtck}):
-We discovered that kind inference can be delayed after type inference
-(it is in some sense quite natural) and exploited the fact to get the
-most out of Prolog (within its limitations), using Prolog's
-native unification as much as possible.
+	We discovered that kind inference can be delayed after type inference
+	(it is in some sense quite natural).
+% and relied on native unification
+% in Prolog as much as possible.
 % (which helped our specification to be more succinct).
-\item A motivating example of calling support for a dualized
-	view on variables in logic programming:
-Type variables are viewed as unification variables
-in type inference but as concrete/atomic variables
-in kind inference in our specification.
-Better way of organizing this concept is desirable
-to produce better relational specifications for polymorphic type systems.
+\item A motivating example for a dualized view on variables
+	in logic programming:
+	Type variables are viewed as unifiable logic variables
+	in type inference but they are viewed as concrete/atomic
+	variables (or identifiers) in kind inference in our specification.
+	Better way of organizing this concept is desirable to produce
+	better relational specifications for polymorphic type systems.
 \end{itemize}
 
 We give a step-by-step tutorial style explanation of our specification in

@@ -130,9 +130,9 @@ tools for staged resolution of different relations at different levels.
 
 \section{Polymorphic Type Inference Specifications in Prolog}
 \label{sec:poly}
-We start from a Prolog specification for the type system of
-HM (\S\ref{ssec:HM}) and then extend the specification to support
-type constructor polymorphism and kind polymorphism (\S\ref{ssec:HMtck}).
+We start from a Prolog specification for the Hindley--Milner type system
+(HM) in \S\ref{ssec:HM} and then extend the specification to support
+type constructor polymorphism and kind polymorphism in \S\ref{ssec:HMtck}.
 
 The following two lines should be loaded into the Prolog system
 before loading the specifications in this paper. {\small\vspace*{-1ex}
@@ -145,7 +145,13 @@ occurs check, which is needed for the correct behavior of type inference.
 The second line declares \verb|$| as a left-associative infix operator,
 which is used to represent the application operator in the object language
 syntax. For instance, {\small\verb|E1$E2|} is an application of
-{\small\verb|E1|} to {\small\verb|E2|}.
+{\small\verb|E1|} to {\small\verb|E2|}. Note that \verb|$| is left associative
+because we want \verb|E1$E2$E3| to mean \verb|((E1$E2)$E3)|.\footnote{
+	We intentionallay adopted the same symbol as the application operator
+	\texttt{\$} in the Haskell standard library. In contrast to the
+	right-associative operator in Haskell, our operator represents
+	the default function application most often denoted by empty spaces
+	and left-associative by convention.}
 
 \begin{figure}[b]
 \begin{verbatim}
@@ -173,8 +179,10 @@ introduced by polymorphic \texttt{let}-bindings.\footnote{ Here,
 	recursive bindings (see \S\ref{ssec:letrec}).}
 In the specification of HM (Fig.~\ref{fig:HM}), a monomorphic type is
 represented as {\small\verb|mono(A)|} and a polymorphic type is represented as
-{\small\verb|poly(C,A)|}. A typing context in HM may contain two kinds of
-bindings: monomorphic bindings ({\small\verb|X:mono(A)|}) and
+{\small\verb|poly(C,A)|}.\footnote{ \texttt{C} is the typing context where
+				\texttt{A} is being generalized.}
+A typing context in HM may contain two kinds of bindings: 
+monomorphic bindings ({\small\verb|X:mono(A)|}) and
 polymorphic bindings ({\small\verb|X:poly(C,A)|}).
 %% The Prolog specification of HM is only 8 lines (excluding empty lines).
 
@@ -182,7 +190,7 @@ The four rules defining the {\small\verb|type|} predicate are almost literal
 transcriptions of the typing rules of HM. The first rule for finding
 a type ({\small\verb|T1|}) of a variable expression ({\small\verb|var(X)|})
 amounts to instantiating ({\small\verb|instantiate(T,T1)|}) the type
-({\small\verb|T|}) in the binding ({\small\verb|X:T|}) that first matches
+({\small\verb|T|}) in the first binding ({\small\verb|X:T|}) that matches
 the variable bound in the typing context ({\small\verb|C|}).
 The two rules for lambda and application expressions are self-explanatory.
 The last rule for \texttt{let}-expressions introduces polymorphic bindings.
@@ -298,7 +306,7 @@ The typing rules (\verb|type|) need some modifications from the rules of HM,
 in order to invoke checks for well-kindedness using the kinding rules
 (\verb|kind|). We discuss the modification in three steps.
 
-First step is to have the typing rules take an additional argument for
+The first step is to have the typing rules take an additional argument for
 the kinding context (\verb|KC|) along with the typing context (\verb|C|).
 %% Because the kinding rules require a kinding context.
 The typing rules
@@ -340,10 +348,10 @@ variablize(var(X)) :- gensym(t,X).
 infer_type(KC,C,E,T) :-
   phrase( type(KC,C,E,T), Gs0 ), % 1st stage of typing in this line
   copy_term(Gs0,Gs),             % 2nd stage of kinding from here
-  findall(Ty, member(kind(_,Ty,_),Gs), Tys),
+  bagof(Ty, member(kind(_,Ty,_),Gs), Tys),
   free_variables(Tys,Xs), % collect all free tyvars in Xs
   maplist(variablize,Xs), % concretize tyvar with var(t) where t fresh
-  findall(A:K, member(var(A),Xs), KC1), % kind bindngs for var(t)
+  bagof(A:K, member(var(A),Xs), KC1), % kind bindngs for var(t)
   appendKC(Gs,KC1,Gs1), % extend each KC with KC1 for new vars
   maplist(call,Gs1).    % run all goals in Gs1
 
@@ -489,7 +497,7 @@ compared to the previous section, because our main purpose here is to
 demonstrate that supporting these features does not significantly increase
 the size and the complexity of our specification. Readers with further
 interest are encouraged to experiment with our specifications available
-on the online repository (see \S\ref{sec:intro}, p.~\pageref{githubURL}).
+online (see \S\ref{sec:intro}, p.~\pageref{githubURL}).
 
 \subsection{Recursive Let-Bindings}\label{ssec:letrec}
 Adding recursive \texttt{let}-bindings is obvious. We simply add
@@ -505,43 +513,6 @@ the \texttt{let}-bound value as follows:
 We could also allow polymorphic recursion by type annotations
 on the \texttt{let}-bound variable, like we will do for Mendler-style iteration
 over non-regular datatypes in \S\ref{ssec:mit}.
-
-
-\subsection{Pattern Matching for Algebraic Datatypes}\label{ssec:patlam}
-In Fig.~\ref{fig:patlam} (on p.~\pageref{fig:patlam}), we specify
-pattern matching expressions without the scrutinee, which is
-also known as pattern-matching lambdas. A pattern lambda is
-a function that awaits an expression to be passed in
-as an argument to pattern match its value. For example,
-let $\{p_1\to e_1;\cdots; p_n\to e_n\}$ be a pattern-matching lambda.
-Then, the application $\,\{p_1\to e_1;\cdots; p_n\to e_n\}\,e\,$
-corresponds to a pattern matching expressions in Haskell of the form
-${\bf\;case}\;e\;{\bf of}\;\{p_1\to e_1;\cdots; p_n\to e_n\}$.
-
-We represent pattern-matching lambdas in Prolog as a list of clauses
-that match each pattern to a body, for instance,
-\verb|['Nil'-->E1, 'Cons'(x,xs)-->E2]|
-where \verb|E1| and \verb|E2| are expressions of the bodies. For simplicity,
-we implement the most simple design of non-nested patterns. That is,
-a pattern is either an atom that represents a nullary data constructor,
-such as \verb|'Nil'|, or a complex term with an $n$-ary function symbol
-that represents an $n$-ary data constructor and $n$ variables as its arguments,
-such as \verb|'Cons'(x,xs)|.
-%% Atoms and function symbols normally start with lowercase letters in Prolog.
-%% However, Prolog allows other names to become atoms and function symbols
-%% when those names are single-quoted.
-Here, we are using the convention that names of type constructors and
-data constructors start with uppercase letters while names of term variables
-(including pattern variables) start with lowercase letters. We also add
-a delayed well-kindedness goal because pattern lambdas introduce function types
-(\verb|A -> T|), just like ordinary lambda expressions.
-
-%% kThe specification above for non-nested pattern-matching lambdas
-%% kis only 14 lines. To sum up, the specification for HM extended
-%% kwith type constructor polymorphism, kind polymorphism, and
-%% knon-nested pattern matching for algebraic datatypes is in $32+14=46$
-%% klines of Prolog, which is also an executable reference implementation
-%% kof the type system.
 
 \begin{figure} %%%% 14 lines
 \begin{verbatim}
@@ -601,6 +572,44 @@ unfold_N_ap(N,E0$E1,E,Es) :- N>0, M is N-1,
 \end{figure}
 
 
+
+\subsection{Pattern Matching for Algebraic Datatypes}\label{ssec:patlam}
+In Fig.~\ref{fig:patlam} (on p.~\pageref{fig:patlam}), we specify
+pattern matching expressions without the scrutinee, which is
+also known as pattern-matching lambdas. A pattern lambda is
+a function that awaits an expression to be passed in
+as an argument to pattern match its value. For example,
+let $\{p_1\to e_1;\cdots; p_n\to e_n\}$ be a pattern-matching lambda.
+Then, the application $\,\{p_1\to e_1;\cdots; p_n\to e_n\}\,e\,$
+corresponds to a pattern matching expressions in Haskell of the form
+${\bf\;case}\;e\;{\bf of}\;\{p_1\to e_1;\cdots; p_n\to e_n\}$.
+
+We represent pattern-matching lambdas in Prolog as a list of clauses
+that match each pattern to a body, for instance,
+\verb|['Nil'-->E1, 'Cons'(x,xs)-->E2]|
+where \verb|E1| and \verb|E2| are expressions of the bodies. For simplicity,
+we implement the most simple design of non-nested patterns. That is,
+a pattern is either an atom that represents a nullary data constructor,
+such as \verb|'Nil'|, or a complex term with an $n$-ary function symbol
+that represents an $n$-ary data constructor and $n$ variables as its arguments,
+such as \verb|'Cons'(x,xs)|.
+%% Atoms and function symbols normally start with lowercase letters in Prolog.
+%% However, Prolog allows other names to become atoms and function symbols
+%% when those names are single-quoted.
+Here, we are using the convention that names of type constructors and
+data constructors start with uppercase letters while names of term variables
+(including pattern variables) start with lowercase letters. We also add
+a delayed well-kindedness goal because pattern lambdas introduce function types
+(\verb|A -> T|), just like ordinary lambda expressions.
+
+%% kThe specification above for non-nested pattern-matching lambdas
+%% kis only 14 lines. To sum up, the specification for HM extended
+%% kwith type constructor polymorphism, kind polymorphism, and
+%% knon-nested pattern matching for algebraic datatypes is in $32+14=46$
+%% klines of Prolog, which is also an executable reference implementation
+%% kof the type system.
+
+
 \subsection{Recursion Schemes for Non-Regular Algebraic Datatypes}
 \label{ssec:mit}
 Consider the following two recursive datatype declarations in Haskell:
@@ -641,7 +650,7 @@ In order to define interesting and useful recursive functions over
 non-regular datatypes, one needs polymorphic recursion, whose 
 type inference is known to be undecidable without the aid of
 user supplied type annotations. In Fig.~\ref{fig:mit} (on p\pageref{fig:mit}),
-we specify a subset of a functional language that supports a recursion scheme
+we specify a subset of a functional language that supports a recursion scheme,
 which naturally generalizes from regular datatypes to non-regular datatypes.
 In particular, we specify
 the Mendler-style iteration \cite{matthes98phd,AbeMatUus03}
@@ -699,8 +708,8 @@ infer_len :- % length of List
   getKC0(KCtx), getC0(Ctx),
   infer_type(KCtx,Ctx,TM_len,T), writeln(T).
 
-%%%% ?- infer_len.
-%%%% var(N)$_G1653
+%%%% ?- infer_len. % corresponds to "List a -> Nat"
+%%%% mu(var(L)$_G1854)->mu(var(N))
 %%%% true .
 
 infer_bsum :- % sum of all elements in Bush of natural numbers
@@ -716,7 +725,7 @@ infer_bsum :- % sum of all elements in Bush of natural numbers
   getKC0(KCtx), getC0(Ctx),
   infer_type(KCtx,Ctx,TM_bsum,T), writeln(T).
 
-%%%% ?- infer_bsum.
+%%%% ?- infer_bsum. % corresponds to "Bush a -> (a -> Nat) -> Nat"
 %%%% mu(var(B))$_G1452-> (_G1452->mu(var(N)))->mu(var(N))
 %%%% true .
 \end{verbatim}
@@ -730,24 +739,25 @@ infer_bsum :- % sum of all elements in Bush of natural numbers
 The \verb|mu(F)| appearing in the Prolog specification corresponds to
 a recursive type $\mu F$ constructed by the fixpoint type operator $\mu$
 applied to a base structure $F$, which is not recursive by itself.
-%% Here, we require that $F$ is either a type constructor introduced by
-%% a (non-recursive) datatype declaration or a partial application of
-%% such a type constructor.
-We add a kinding rule for the fixpoint type operator
+Here, we require that $F$ is either a type constructor introduced by
+a (non-recursive) datatype declaration or a partial application of
+such a type constructor. We add a kinding rule for the fixpoint type operator
 by adding another rule of the \verb|kind| predicate for \verb|mu(F)|.
 The Mendler-style iteration over regular datatypes (\verb|mit(X,Alts)|)
 does not need any type annotation. The Mendler-style iteration over
 non-regular datatypes (\verb|mit(X,Is-->T0,Alts)|) needs an annotation
 (\verb|Is-->T0|) to guide the type inference because it is likely to rely on
-polymorphic recursion. The specification for Mendler-style iteration relies
-on pattern-matching lambdas discussed in the previous subsection. Once we have
-properly set up the kinding context and typing context for the name of
-the recursive call (\verb|X|), the rest amounts to inferring types for
-pattern-matching lambdas. Pointers to further details on Mendler-style
-recursion \cite{vene00phd,AbeMatUus03,AhnShe11} and Nax \cite{Ahn14thesis}
-are available in the references section at the end of this paper.
-Here, in Fig.~\ref{fig:TIexample}, we provide type inference queries on
-some example programs using Mendler-style iteration.
+polymorphic recursion. We require that \texttt{Is} must be list of variables.
+For instance, \verb|mit(X,[I1,I2,I3]-->T0,Alts)| has type
+\verb|(mu(F)$I1$I2$I3)->T0| for some \verb|F|. The specification for
+Mendler-style iteration relies on pattern-matching lambdas discussed in
+the previous subsection. Once we have properly set up the kinding context
+and typing context for the name of the recursive call (\verb|X|), the rest
+amounts to inferring types for pattern-matching lambdas. Pointers to further
+details on Mendler-style recursion \cite{vene00phd,AbeMatUus03,AhnShe11} and
+Nax \cite{Ahn14thesis} are available in the references section at the end of
+this article. Here, in Fig.~\ref{fig:TIexample}, we provide type inference
+queries on some example programs using Mendler-style iteration.
 
 
 
@@ -789,7 +799,7 @@ polymorphic instantiation in \S\ref{sec:poly}.
 
 The kind structure needed for type constructor polymorphism is exactly
 the kinds supported in the higher-order polymorphic lambda calculus,
-known as System \Fw \cite{girard72thesis}.
+known as System \Fw\ \cite{girard72thesis}.
 Type constructors in \Fw\ can have types as arguments.
 For example, the type constructor \textit{List}
 for lists has kind $* \to *$, which means that it needs one type argument
