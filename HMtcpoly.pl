@@ -35,9 +35,9 @@ variablize(var(X)) :- gensym(t,X).
 infer_type(KC,C,E,T) :-
   type(KC,C,E,T,[],Gs0), %%% handle delayed kind sanity check below
   copy_term(Gs0,Gs),
-  findall(Ty, member(kind(_,Ty,_),Gs), Tys),
+  bagof(Ty, member(kind(_,Ty,_),Gs), Tys),
   free_variables(Tys,Xs), maplist(variablize,Xs), % replace free tyvar to var(t)
-  findall(A:K,member(var(A),Xs),KC1),
+  bagof(A:K,member(var(A),Xs),KC1),
   appendKC(Gs,KC1,Gs1), % extend with KC1 for new vars
   maplist(call,Gs1). % run all goals in Gs1
 

@@ -2,14 +2,29 @@
 \subsection{A Framework for Extending HM}
 The idea of using logic programming (LP) to specify type inference is not new.
 \citet*{HMX99} defined a general framework called \HMX\ for specifying
-extensions of HM (e.g., records, type classes, intersection types)
-and \citet{tyinferCHR02} implemented \HMX\ using Prolog.
-Testing a type system extension in the \HMX\ framework provides
+extensions of HM (e.g., records, type classes, intersection types) and
+\citet{tyinferCHR02} implemented \HMX\ using Constraint Hanling Rules (CHR)
+in Prolog. Testing a type system extension in the \HMX\ framework provides
 a certain level of confidence that the extension would work well with
 type polymorphism in HM. Testing an extension by extending our specification
 provides additional confidence that the extension would work well with
-type constructor polymorphism and kind polymorphism, as well as with
-type polymorphism.
+type constructor polymorphism and kind polymorphism, as well as
+with type polymorphism.
+
+CHR have been used for type inference in many other occasions.
+For instance, \citet{CsorbaCHRforTyInf12} discuss
+``\emph{Pros and Cons of using CHR for Type Inference}'' of the Q programming
+language, which is a functional language well suited for complex calculations
+on large volume of data, supporting lists, dictionaries, tables, and functions.
+Although Q was designed to be strongly typed, prior implementiatons dynamically
+checked those types during runtime execution. They implemented a static type
+inference for Q using CHR in Prolog. Interestinly, our work using Prolog for
+type inference shares a common \emph{Con} (difficulties they had to
+overcome by workaround) in their work using CHR in Prolog for type inference.
+One of their difficulties was to ``influence the firing order of rules
+with different heads'', which corresponds to our need to process \texttt{kind}
+predicates after processing \texttt{type} predicates. Such \emph{Cons} seem
+to be common in LP regardless of the use of CHR.
 
 \subsection{Delayed Goals and Control Flow in Logic Programming}
 The concept of delayed goals has been used in many different contexts in LP.
@@ -37,7 +52,7 @@ them. The \aProlog\ developer attempted to implement the HM type inference for
 mini-ML in \aProlog, but failed to produce a working version.\footnote{
 	See \texttt{miniml.apl} in the examples directory of
 	the \aProlog\ version 0.4 or 0.3.}
-The Teyjus \lProlog\ compiler version 2 includes a PCF example,
+The Teyjus \lProlog\ compiler version 2 includes a PCF \cite{Scott69} example,
 which is similar to HM but without polymorphic \texttt{let}-bindings.
 In both example implementations, they define the type inference predicate
 tailored for type inference only (unlike our relational specification that
@@ -65,10 +80,11 @@ flexible, simple, and portable. If one is to build a tool based on LP concepts
 and wishes to support interfaces to one or more programming languages,
 \muKanren\ may be a good choice to target as the backend.
 
-Recently, there has been research on type inference using LP with non-standard
-semantics (e.g., corecursive, coinductive) for object-oriented languages
-(e.g., featherweight Java) but functional languages were left for
-future work \cite{AL-ECOOP09}.
+Executable type system specifications in Prolog have been studied for supporting
+static types in Prolog itself (e.g., \cite{SchrijversCWD08}). Recently, there
+has been research on type inference using LP with non-standard semantics (e.g.,
+corecursive, coinductive) for object-oriented languages (e.g., featherweight
+Java) but functional languages were left for future work \cite{AL-ECOOP09}.
 \citet{SRLP15} have developed S-resolution, which is proven \cite{PCR15} to
 produce the same results when the depth-first-search style SLD-resolution
 used in Prolog is proven to be inductive. S-resolution can also answer
@@ -85,7 +101,7 @@ Interactive Theorem Provers (ITPs) such as Coq \cite{Dubois00} and
 Isabelle/HOL \cite{UrbanN2009}. The primary motivation %% NaraschewskiN-JAR,
 in such work is to formally prove theoretical properties (e.g., soundness,
 principal typing) of type inference algorithms, which is different from
-our motivation of providing a human readable \& machine executable
+our motivation of providing a human readable and machine executable
 specification for the type system to reduce the gap between
 theoretical specification and practical implementation. Some of those
 descriptions  are not even executable because the unification is merely
