@@ -1,7 +1,10 @@
 The purpose of this docuement is basically a TODO list for revision.
 Will be crossing out the contents of already revised things.
 Reveiw contents that are irrelavant will be corssed out as well.
-
+I've used up all the spaces so there isn't really room for the comments below
+to be resolved. I think what we have here might be the final camera-ready
+copy. If we are lucky enough to be selected for journal invitation, then
+ we might consider addressing some of the comments below.
 
 ----------------------- REVIEW 1 ---------------------
 
@@ -13,32 +16,18 @@ data types and polymorphic recursion is written in a very compact
 style and some constructs lack an introduction,
 which makes it hard to understand.
 
-Moreover, the use of Prolog to implement inference systems
-is natural and, thus, well known for a long time (e.g.,
-compare Typol and similar approaches from the 90s) so that
-the current approach is not quite innovative.
-The authors should definitively compare their work to these
-and other approaches to specify type systems, e.g., higher-order
-logic systems like lambda-Prolog or LF (or Twelf, see
-http://twelf.org/wiki/Lily).
-
 Comments
 ========
 
-Figure 4 also contains auxiliary functions unfold_N_ap whose purpose is left
-open. I therefore suggest to extend the explanation of the implementation
-presented in Figure 4. To get along with the supplied space, I furthermore
-suggest to reduce or even omit the Figure 5, since in my perception it did
-not provide as much insights as a more detailed explanation of Figure 4 would
-have done.
+To get along with the supplied space, I furthermore suggest to reduce or
+even omit the Figure 5, since in my perception it did not provide as much
+insights as a more detailed explanation of Figure 4 would have done.
 
-Typos, Style
-============
+Style
+=====
 
 - Please consider adding line numbers to your submissions, as it facilitates
   the exchange of typos and alike for both you and me!
-
-- Figure 4: `in(N,E)` was not explained
 
 ----------------------- REVIEW 2 ---------------------
 
@@ -77,10 +66,6 @@ Some comments:
 
 - the paper would be stronger if it could clarify at the beginning the extent to
 which it covers a full FP implementation (and there are several to choose from).
-
-- The Fig 1 program is really critical to the paper, so it should start by
-precisely defining what it does: type an expression E, given a typing context C.
-Maybe you could add a short pldoc style comment to Fig 1 in order to do that?
 
 - With fully functioning basic building blocks for kind inference (kind) and
 type inference (type), should be .... -> It would be nice if you could have

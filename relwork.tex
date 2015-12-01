@@ -1,9 +1,21 @@
 \section{Related Work}\label{sec:relwork}
-\subsection{A Framework for Extending HM}
-The idea of using logic programming (LP) to specify type inference is not new.
-\citet*{HMX99} defined a general framework called \HMX\ for specifying
-extensions of HM (e.g., records, type classes, intersection types) and
-\citet{tyinferCHR02} implemented \HMX\ using Constraint Hanling Rules (CHR)
+\subsection{\HMX, CHR, and Typol}
+The idea of using logic programming (LP) to specify type systems is not new,
+for instance, Typol \cite{Despeyroux84} and \HMX\ \cite{HMX99}.
+
+Typol is a specification language for both static semantics (i.e. type systems)
+and dynamic semantics of programming languages, where type checkers and
+interpreters could be generated directly from Typol specifications
+by compiling the specification into Prolog code. Although \citet{Despeyroux84}
+demonstrated that Typol can be used for type system based on HM (more
+specifically, the core of ML), it was mainly used for language specifications
+without parametric polymorphism --- in the 80's, there were not as much
+practical programming languages supporting parametric polymorphism as
+in the 21st centry.
+
+In the late 90's, \citet*{HMX99} defined a general framework called \HMX\ for
+specifying extensions of HM (e.g., records, type classes, intersection types)
+and \citet{tyinferCHR02} implemented \HMX\ using Constraint Hanling Rules (CHR)
 in Prolog. Testing a type system extension in the \HMX\ framework provides
 a certain level of confidence that the extension would work well with
 type polymorphism in HM. Testing an extension by extending our specification
@@ -11,16 +23,15 @@ provides additional confidence that the extension would work well with
 type constructor polymorphism and kind polymorphism, as well as
 with type polymorphism.
 
-CHR have been used for type inference in many other occasions.
-For instance, \citet{CsorbaCHRforTyInf12} discuss
-``\emph{Pros and Cons of using CHR for Type Inference}'' of the Q programming
-language, which is a functional language well suited for complex calculations
-on large volume of data, supporting lists, dictionaries, tables, and functions.
+CHR have been used for type inference in many other occasions. For instance,
+\citet{CsorbaCHRforTyInf12} discuss ``\emph{Pros and Cons of using CHR for
+Type Inference}'' of the Q programming language, which is a functional
+language well suited for complex calculations on large volume of data.
 Although Q was designed to be strongly typed, prior implementiatons dynamically
 checked those types during runtime execution. They implemented a static type
 inference for Q using CHR in Prolog. Interestinly, our work using Prolog for
-type inference shares a common \emph{Con} (difficulties they had to
-overcome by workaround) in their work using CHR in Prolog for type inference.
+type inference shares a common \emph{Con} (difficulties they had to overcome
+by workaround) in their work using CHR in Prolog for type inference.
 One of their difficulties was to ``influence the firing order of rules
 with different heads'', which corresponds to our need to process \texttt{kind}
 predicates after processing \texttt{type} predicates. Such \emph{Cons} seem
@@ -65,7 +76,7 @@ Kanren\footnote{ Kanren is a phonetic transcription of the Kanji word
 	See \url{http://kanren.sourceforge.net/} } \cite{ReasonedSchemer}
 is a declarative LP system embedded in a pure functional subset of Scheme.
 A relational implementation of HM is provided in
-the Kanren repository,\footnote{See \url{http://kanren.sourceforge.net/\#Sample}}
+the Kanren repository,% \footnote{See \url{http://kanren.sourceforge.net/\#Sample}}
 which works for both type checking, type inference, and also for
 type inhabitance searching, as in our HM specification in Prolog.
 A simplified version called miniKanren \cite{minikanrenThesis} has been

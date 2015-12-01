@@ -172,33 +172,43 @@ because we want \verb|E1$E2$E3| to mean \verb|((E1$E2)$E3)|.\footnote{
 \vspace*{-2ex}
 \end{figure}
 \subsection{HM}\label{ssec:HM}
+The four rules defining the {\small\verb|type|} predicate in the specification
+of HM (Fig.~\ref{fig:HM}) are almost literal transcriptions of the typing rules
+of HM. The query {\small\verb|type(C,E,T)|} represents a typing judgment usually
+denoted by $\texttt{C}\vdash\texttt{E}:\texttt{T}$ on paper, meaning that
+the expression {\small\verb|E|} can be assinged a type {\verb|T|} under the
+typing context {\small\verb|C|}. A typing
+context is a list of binidings. There are two kinds of bindings in HM: 
+monomorphic bindings ({\small\verb|X:mono(A)|}) and
+polymorphic bindings ({\small\verb|X:poly(C,A)|}).
+Expressions in HM are either variables ({\small\verb|X|}), lambda expressions
+({\small\verb|lam(X,E)|}), applications ({\small\verb|E1$E2|}), or
+\texttt{let}-expressions ({\small\verb|let(X=E0,E1)|}).
+
+The first rule for finding a type ({\small\verb|T1|}) of a variable
+({\small\verb|var(X)|}) amounts to instantiating
+({\small\verb|instantiate(T,T1)|}) the type ({\small\verb|T|}) from
+the first binding ({\small\verb|X:T|}) that matches the variable
+({\small\verb|X|}) bound in the typing context ({\small\verb|C|}).
+The two rules for lambda expresions and applications are self-explanatory.
+The last rule for \texttt{let}-expressions introduces polymorphic bindings.
 HM supports rank-1 polymorphic types (a.k.a. type schemes), which are
-introduced by polymorphic \texttt{let}-bindings.\footnote{ Here,
+introduced by this polymorphic \texttt{let}-bindings.\footnote{ Here,
 	in this subsection, we consider non-recursive bindings only 
 	but the specification of HM can be easily modified to support
 	recursive bindings (see \S\ref{ssec:letrec}).}
-In the specification of HM (Fig.~\ref{fig:HM}), a monomorphic type is
-represented as {\small\verb|mono(A)|} and a polymorphic type is represented as
-{\small\verb|poly(C,A)|}.\footnote{ \texttt{C} is the typing context where
-				\texttt{A} is being generalized.}
-A typing context in HM may contain two kinds of bindings: 
-monomorphic bindings ({\small\verb|X:mono(A)|}) and
-polymorphic bindings ({\small\verb|X:poly(C,A)|}).
+The typing context {\small\texttt{C}} inside the polymoprhic bniding
+{\small\verb|poly(C,A)|} is the typing context of the \texttt{let}-expression
+where \texttt{A} is being generalized.
 %% The Prolog specification of HM is only 8 lines (excluding empty lines).
 
-The four rules defining the {\small\verb|type|} predicate are almost literal
-transcriptions of the typing rules of HM. The first rule for finding
-a type ({\small\verb|T1|}) of a variable expression ({\small\verb|var(X)|})
-amounts to instantiating ({\small\verb|instantiate(T,T1)|}) the type
-({\small\verb|T|}) in the first binding ({\small\verb|X:T|}) that matches
-the variable bound in the typing context ({\small\verb|C|}).
-The two rules for lambda and application expressions are self-explanatory.
-The last rule for \texttt{let}-expressions introduces polymorphic bindings.
+
+
 % Note that a polymorphic biding \verb|poly(C,A)| refers to
 % the typing context \verb|C| of the \texttt{let}-expression.
 
 The {\small\verb|instantiate|} predicate
-cleverly implements the idea of polymorphic instantiation in HM.
+cleverly implements the idea of the polymorphic instantiation in HM.
 The built-in predicate {\small\verb|copy_term|} makes a copy of
 the first argument and unifies it with the second argument. The copied version
 is identical to the original term except that all the Prolog variables have been
@@ -535,8 +545,8 @@ type_alt(KC,C,P->E,A->T) --> % assume single depth pattern (C x0 .. xn)
   type(KC,C1,PE,A), type(KC,C1,E,T).
 
 upper_atom(A) :- atom(A), atom_chars(A,[C|_]), char_type(C,upper).
-lower_atom(A) :- atom(A), atom_chars(A,[C|_]), char_type(C,lower).
 
+% foldl_ap(E, [E1,...,En], E$E1$...$En).
 foldl_ap(E, []     , E).
 foldl_ap(E0,[E1|Es], E) :- foldl_ap(E0$E1, Es, E).
 \end{verbatim}
@@ -566,6 +576,7 @@ type(KC,C,mit(X,Is-->T0,Alts),A->T) -->
   { foldl_ap(F,[var(R)|Is],FRIs) },
   type_alts(KC1,C1,Alts,FRIs->T).
 
+% unfold_N_ap(N, E$E_1$...$E_N, E, [E_1,...,E_N]).
 unfold_N_ap(0,E,    E,[]).
 unfold_N_ap(N,E0$E1,E,Es) :- N>0, M is N-1,
                              unfold_N_ap(M,E0,E,Es0), append(Es0,[E1],Es).
@@ -720,17 +731,17 @@ infer_len :- % length of List
 infer_bsum :- % sum of all elements in Bush of natural numbers
   TM_bsum = mit(bsum, [I]-->((I->mu(var('N')))->mu(var('N'))),
             [ 'BN'       -> lam(f,Zero)
-            , 'BC'(x,xs) -> lam(f,
-                  var(plus)
-                     $ (var(f)$var(x))
-                     $ (var(bsum) $ var(xs)
+            , 'BC'(x,xs) -> lam(f, % f : I -> Nat
+                  var(plus) % f x + bsum xs (\ys -> bsum ys f)
+                     $ (var(f)$var(x)) % calculate Nat value from x
+                     $ (var(bsum) $ var(xs)  % recursive call on xs
                                   $ lam(ys,var(bsum)$var(ys)$var(f))))
             ]),
   Zero = in(0,var('Z')),
   getKC0(KCtx), getC0(Ctx),
   infer_type(KCtx,Ctx,TM_bsum,T), writeln(T).
 
-%%%% ?- infer_bsum. % corresponds to "Bush a -> (a -> Nat) -> Nat"
+%%%% ?- infer_bsum. % corresponds to "Bush i -> (i -> Nat) -> Nat"
 %%%% mu(var(B))$_G1452-> (_G1452->mu(var(N)))->mu(var(N))
 %%%% true .
 \end{verbatim}
@@ -741,13 +752,21 @@ infer_bsum :- % sum of all elements in Bush of natural numbers
 %%   \texttt{Is} and \texttt{T0} in \texttt{Is-->T0} as discussed in conversation
 %%   with Patricia.}
 
-The \verb|mu(F)| appearing in the Prolog specification corresponds to
+The {\small\verb|mu(F)|} appearing in the Prolog specification corresponds to
 a recursive type $\mu F$ constructed by the fixpoint type operator $\mu$
-applied to a base structure $F$, which is not recursive by itself.
-Here, we require that $F$ is either a type constructor introduced by
-a (non-recursive) datatype declaration or a partial application of
-such a type constructor. We add a kinding rule for the fixpoint type operator
-by adding another rule of the \verb|kind| predicate for \verb|mu(F)|.
+applied to a base structure $F$, which is not recursive by itself. Here,
+we require that $F$ is either a type constructor introduced by a (non-recursive)
+datatype declaration or a partial application of such a type constructor.
+We add a kinding rule for the fixpoint type operator by adding another rule of
+the {\small\verb|kind|} predicate for {\small\verb|mu(F)|}. We also add two
+accompanying rules for recursive values. The expression {\small\verb|in(N,E)|}
+constructs a recursive value of type {\small\verb|mu(F)$I_0$...$I_N|}.
+In case of regular datatypes, where \verb|mu(F)| does not require additional
+type arguments (i.e., {\small\verb|mu(F):o|}), {\small\verb|N|} is \verb|0|.
+The Mendler-style iteration expressions define (terminating) recursive
+computation over recursive values. There are two rules for Mendler-style
+iteration -- one for regular datatypes and the other for non-reglar datatypes.
+
 The Mendler-style iteration over regular datatypes (\verb|mit(X,Alts)|)
 does not need any type annotation. The Mendler-style iteration over
 non-regular datatypes (\verb|mit(X,Is-->T0,Alts)|) needs an annotation
@@ -786,7 +805,7 @@ data constructors should be straightforward.
 \section{Future Work}\label{sec:futwork}
 We plan to continue our work on several additional features, including
 generalized algebraic datatypes (GADTs) and real term-indices
-in GADTs (as in Nax). %, and row polymorphism \cite{Gaster96apolymorphic}.
+in GADTs (as in Nax).
 
 GADTs add the complexity of introducing local constraints
 within a pattern-matching clause, which should not escape
@@ -840,6 +859,13 @@ Extending our specification with term indices would be
 an interesting future work that might involve resolving possible challenges
 from these two ramifications.
 
+In addition, we are planning to develop specifications for more practical
+language constructs such as records with named fields and modules for
+organizing definitions in different namespaces. To support high degree of
+polymorphism with records and modules, we will also need to support
+\emph{row polymorphism} \cite{Gaster96apolymorphic} and
+\emph{first-class polymorphism} (e.g., \cite{QML09}).
+
 %%%%%% \section{Related Work}\label{sec:relwork} %%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{relwork}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -863,11 +889,11 @@ for control flow in LP, alternative resolution semantics). We believe
 that there should be a tool that makes it easy to develop relational
 specifications of type systems. Such a tool can open a new era
 in language construction, analogous to the impact when parser generators
-such as yacc were first introduced. But to realize such a tool, we need
-a combined effort of both functional and logic programing communities to
-seamlessly put together such novel ideas accomplished individually
-in different settings into the context of ``\emph{relational specifications
-of polymorphic type systems}''.
+such as yacc were first introduced. But to realize such a tool beyond
+pedagogical applications, we need a combined effort of
+both functional and logic programing communities to seamlessly put together
+such novel ideas accomplished individually in different settings into
+the context of ``\emph{relational specifications of polymorphic type systems}''.
 
 % We defined in Prolog a type inference implementation for a non-trivial
 % type system by making extensive use of Prolog's native support for
@@ -903,7 +929,7 @@ of polymorphic type systems}''.
 % TODO our approach into a practical tool. TODO many languages didn't have
 % TODO static
 % TODO types now wants to support static types (at least optionally)
-% TODO Typed Lua, Typed Clojure, Mypy, TypeScript
+% TODO Typed Lua, Typed Clojure, Mypy, Flow, TypeScript
 % TODO Mention typer project
 % TODO 
 %
@@ -912,7 +938,8 @@ of polymorphic type systems}''.
 Thanks to Patricia Johann for helping us clarify the specification
 for Mendler-style iteration, Ekaterina Komendantskaya and
 Frantisek Farka for the discussions on S-Resolution,
-Peng Fu for pointers to Kanren, and Chris Warburton for careful proofreading.
+Peng Fu for pointers to Kanren, Chris Warburton for careful proofreading,
+and FLOPS'16 reviewers for their feedback.
 \makeatletter
 \renewcommand\bibsection{\section*\bibname}
 \makeatother
