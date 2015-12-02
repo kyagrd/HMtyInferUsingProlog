@@ -707,7 +707,7 @@ getC0(% Ctors of N
       , 'S':poly([] , R1 -> N$R1)
       % Ctors of L
       , 'N':poly([] , L$A2$R2)
-      , 'C':poly([] , A2->(R2->(L$A2$R2)))
+      , 'C':poly([] , A2-> R2-> L$A2$R2)
       % Ctors of B
       , 'BN':poly([] , B$R3$A3)
       , 'BC':poly([] , A3 -> R3$(R3$A3) -> B$R3$A3)
