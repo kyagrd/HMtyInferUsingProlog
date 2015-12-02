@@ -176,9 +176,9 @@ The four rules defining the {\small\verb|type|} predicate in the specification
 of HM (Fig.~\ref{fig:HM}) are almost literal transcriptions of the typing rules
 of HM. The query {\small\verb|type(C,E,T)|} represents a typing judgment usually
 denoted by $\texttt{C}\vdash\texttt{E}:\texttt{T}$ on paper, meaning that
-the expression {\small\verb|E|} can be assinged a type {\verb|T|} under the
+the expression {\small\verb|E|} can be assigned a type {\verb|T|} under the
 typing context {\small\verb|C|}. A typing
-context is a list of binidings. There are two kinds of bindings in HM: 
+context is a list of bindings. There are two kinds of bindings in HM: 
 monomorphic bindings ({\small\verb|X:mono(A)|}) and
 polymorphic bindings ({\small\verb|X:poly(C,A)|}).
 Expressions in HM are either variables ({\small\verb|X|}), lambda expressions
@@ -190,14 +190,14 @@ The first rule for finding a type ({\small\verb|T1|}) of a variable
 ({\small\verb|instantiate(T,T1)|}) the type ({\small\verb|T|}) from
 the first binding ({\small\verb|X:T|}) that matches the variable
 ({\small\verb|X|}) bound in the typing context ({\small\verb|C|}).
-The two rules for lambda expresions and applications are self-explanatory.
+The two rules for lambda expressions and applications are self-explanatory.
 The last rule for \texttt{let}-expressions introduces polymorphic bindings.
 HM supports rank-1 polymorphic types (a.k.a. type schemes), which are
 introduced by this polymorphic \texttt{let}-bindings.\footnote{ Here,
 	in this subsection, we consider non-recursive bindings only 
 	but the specification of HM can be easily modified to support
 	recursive bindings (see \S\ref{ssec:letrec}).}
-The typing context {\small\texttt{C}} inside the polymoprhic bniding
+The typing context {\small\texttt{C}} inside the polymorphic binding
 {\small\verb|poly(C,A)|} is the typing context of the \texttt{let}-expression
 where \texttt{A} is being generalized.
 %% The Prolog specification of HM is only 8 lines (excluding empty lines).
@@ -229,7 +229,7 @@ binding context {\small\verb|C|} will effectively be freshly instantiated in
 {\small\verb|T1|}. For example, the result of 
 {\small\verb|copy_term(t([X:T],Y->X),t([X:T],T1))|} is
 {\small\verb|T1 = Y1->X|}, where only {\small\verb|Y|} is instantiated to
-a fresh varaible {\small\verb|Y1|} but {\small\verb|X|} stays the same
+a fresh variable {\small\verb|Y1|} but {\small\verb|X|} stays the same
 because it appears in the typing context {\small\verb|[X:T]|}. This exactly
 captures generalization and instantiation of polymorphic types in HM.
 
@@ -765,7 +765,7 @@ In case of regular datatypes, where \verb|mu(F)| does not require additional
 type arguments (i.e., {\small\verb|mu(F):o|}), {\small\verb|N|} is \verb|0|.
 The Mendler-style iteration expressions define (terminating) recursive
 computation over recursive values. There are two rules for Mendler-style
-iteration -- one for regular datatypes and the other for non-reglar datatypes.
+iteration -- one for regular datatypes and the other for non-regular datatypes.
 
 The Mendler-style iteration over regular datatypes (\verb|mit(X,Alts)|)
 does not need any type annotation. The Mendler-style iteration over
