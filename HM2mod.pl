@@ -15,8 +15,8 @@ type(KC,C,X $ Y,       B) :- type(KC,C,X,A->B), type(KC,C,Y,A).
 type(KC,C,let(X=E0,E1),T) :- type(KC,C,              E0,A),
                              type(KC,[X:poly(C,A)|C],E1,T).
 
-instantiate(poly(C,T),T1) :- copy_term(t(C,T),t(C,T1)).
 instantiate(mono(T),  T).
+instantiate(poly(C,T),T1) :- copy_term(t(C,T),t(C,T1)).
 
 first(K:V,[K1:V1|Xs]) :- K = K1, V=V1.
 first(K:V,[K1:V1|Xs]) :- K\==K1, first(K:V, Xs).
