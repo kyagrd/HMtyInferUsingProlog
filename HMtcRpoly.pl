@@ -55,13 +55,6 @@ infer_type(KC,C,E,T) :-
 printnl(X) :- print(X), nl.
 
 
-get_ctx([pair:(o->o->o)|_],[pair:poly([],A0->B0->(var(pair)$A0$B0))]).
-get_id(lam(x,var(x))).
-get_tru(lam(x,lam(y,var(x)))).
-
-
-
-
 ctx0([ 'Nat':mono(o)
      , 'List':mono(o->o)
      , 'Pair':mono(o->o->o)
