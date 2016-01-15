@@ -61,7 +61,8 @@ unfold_N_ap(N,E0$E1,E,Es) :-
 foldl_ap(E, []     , E).
 foldl_ap(E0,[E1|Es], E) :- foldl_ap(E0$E1, Es, E).
 
-first(X:T,[X1:T1|Zs]) :- X = X1 -> T = T1 ; first(X:T, Zs).
+first(X:T,[X1:T1|Zs]) :- X = X1, T = T1.
+first(X:T,[X1:T1|Zs]) :- X\==X1, first(X:T, Zs).
 
 instantiate(poly(C,T),T1) :- copy_term(t(C,T),t(C,T1)).
 instantiate(mono(T),T).

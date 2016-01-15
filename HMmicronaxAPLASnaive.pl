@@ -101,9 +101,9 @@ infer_type(KC,C,E,T) :-
   writef("Gs0 = "), write(Gs0), nl,
   copy_term(Gs0,Gs),
   writef("Gs = "), write(Gs), nl,
-  findall(Ty, member(kind(_,Ty,_),Gs), Tys),
+  bagof(Ty, member(kind(_,Ty,_),Gs), Tys),
   free_variables(Tys,Xs), maplist(variablize,Xs), % replace free tyvar to var(t)
-  findall(A:K,member(var(A),Xs),KC1), appendKC(Gs,KC1,Gs1), % extend with KC1 for new vars
+  bagof(A:K,member(var(A),Xs),KC1), appendKC(Gs,KC1,Gs1), % extend with KC1 for new vars
   writef("T = "), write(T), nl,
   writef("C = "), write(C), nl,
   writef("KC1 = "), write(KC1), nl,

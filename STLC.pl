@@ -6,4 +6,5 @@ type(C,var(X),       T) :- first(X:T,C).
 type(C,lam(X,E),A -> B) :- type([X:A|C], E,  B).
 type(C,X $ Y,        B) :- type(C,X,A -> B), type(C,Y,A).
 
-first(K:V,[K1:V1|Xs]) :- K=K1 -> V=V1 ; first(K:V, Xs).
+first(K:V,[K1:V1|Xs]) :- K=K1, V=V1.
+first(K:V,[K1:V1|Xs]) :- K\==K1, first(K:V, Xs). % no cut but using var cmp

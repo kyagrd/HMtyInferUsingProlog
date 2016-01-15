@@ -15,10 +15,11 @@ type(KC,C,X $ Y,       B,G,G1) :- type(KC,C,X,A->B,G, G0),
 type(KC,C,let(X=E0,E1),T,G,G1) :- type(KC,C,E0,A,G, G0),
                                   type(KC,[X:poly(C,A)|C],E1,T,G0,G1).
 
-first(X:T,[X1:T1|Zs]) :- X = X1 -> T = T1 ; first(X:T, Zs).
+first(X:T,[X1:T1|Zs]) :- X = X1, T = T1.
+first(X:T,[X1:T1|Zs]) :- X\==X1, first(X:T, Zs).
 
-instantiate(poly(C,T),T1) :- copy_term(t(C,T),t(C,T1)).
 instantiate(mono(T),T).
+instantiate(poly(C,T),T1) :- copy_term(t(C,T),t(C,T1)).
 
 inst_type(KC,poly(C,T),T2,G,G1) :- copy_term(t(C,T),t(C,T1)), 
   free_variables(T,Xs), free_variables(T1,Xs1), % Xs and Xs1 are same length
@@ -37,9 +38,7 @@ infer_type(KC,C,E,T) :-
   copy_term(Gs0,Gs),
   bagof(Ty, member(kind(_,Ty,_),Gs), Tys),
   free_variables(Tys,Xs), maplist(variablize,Xs), % replace free tyvar to var(t)
-  bagof(A:K,member(var(A),Xs),KC1),
-  appendKC(Gs,KC1,Gs1), % extend with KC1 for new vars
-  maplist(call,Gs1). % run all goals in Gs1
+  maplist(call,Gs). % run all goals in Gs1
 
 appendKC([],_,[]).
 appendKC([kind(KC,X,K)|Gs],KC1,[kind(KC2,X,K)|Gs1]) :-
@@ -50,6 +49,7 @@ appendKC([kind(KC,X,K)|Gs],KC1,[kind(KC2,X,K)|Gs1]) :-
 
 ctx0([ 'Nat':mono(o)
      , 'List':mono(o->o)
+     | _
      ],
      [ 'Zero':mono(Nat)
      , 'Succ':mono(Nat -> Nat)
