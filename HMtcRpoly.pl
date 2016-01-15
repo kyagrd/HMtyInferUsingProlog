@@ -54,9 +54,6 @@ infer_type(KC,C,E,T) :-
 
 printnl(X) :- print(X), nl.
 
-% get_ctx(KC,C), infer_type(KC,C,lam(r,var(pair)$sel(var(r),y)$var(r))${[x=lam(x,var(x))]},T).
-%
-% Works pretty well be I think it will eventually need record unification
 
 get_ctx([pair:(o->o->o)|_],[pair:poly([],A0->B0->(var(pair)$A0$B0))]).
 get_id(lam(x,var(x))).
