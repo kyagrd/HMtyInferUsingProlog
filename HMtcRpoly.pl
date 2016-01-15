@@ -14,7 +14,7 @@ type(KC,C,X $ Y,      B) --> type(KC,C,X,A->B), type(KC,C,Y,A).
 type(KC,C,let(X=E0,E),T) --> type(KC,C,E0,A), type(KC,[X:poly(C,A)|C],E,T).
 type(KC,C,{[]},     {R}) --> [kind(KC,R,row)].
 type(KC,C,{[X=E|L]},{R}) --> type(KC,C,E,T), { first(X:T,R) }, type(KC,C,{L},{R}).
-type(KC,C,sel(L,X),    T) --> { first(X:T,R) }, type(KC,C,L,{R}).
+type(KC,C,sel(L,X),   T) --> { first(X:T,R) }, type(KC,C,L,{R}).
 
 first(K:V,[K1:V1|Xs]) :- K = K1, V=V1.
 first(K:V,[K1:V1|Xs]) :- K\==K1, first(K:V, Xs).
@@ -49,7 +49,7 @@ infer_type(KC,C,E,T) :-
   free_variables(Tys,Xs),
   % maplist(printnl,Xs), nl, nl,
   maplist(variablize,Xs), % replace free tyvar to var(t)
-  maplist(call,Gs). % run all goals in Gs1
+  maplist(call,Gs). % run all goals in Gs
 
 
 printnl(X) :- print(X), nl.
