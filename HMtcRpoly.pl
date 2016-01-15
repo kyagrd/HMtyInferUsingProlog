@@ -86,4 +86,3 @@ main(T) :- ctx0(KC,C),
   TM_e8 = lam(r,Pair$sel(var(r),y)$var(r))${[x=lam(x,var(x))]},
   infer_type(KC,C,TM_e5,T).
 
-
